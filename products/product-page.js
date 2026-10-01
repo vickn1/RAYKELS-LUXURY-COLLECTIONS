@@ -57,76 +57,8 @@ async function loadProductPage() {
   const video =
     document.querySelector('[data-product-video]');
 
-  const images = Array.isArray(product.images)
-    ? product.images
-    : [];
-
-  const videos = Array.isArray(product.videos)
-    ? product.videos
-    : [];
-
-  function getImageUrl(item) {
-    if (typeof item === 'string') {
-      return item;
-    }
-
-    return item?.url || '';
-  }
-
-  function getImageAlt(item, index) {
-    if (typeof item === 'object' && item?.alt) {
-      return item.alt;
-    }
-
-    return `${product.name} image ${index + 1}`;
-  }
-
-  function getVideoUrl(item) {
-    if (typeof item === 'string') {
-      return item;
-    }
-
-    return item?.url || '';
-  }
-
-  function getVideoTitle(item, index) {
-    if (typeof item === 'object' && item?.title) {
-      return item.title;
-    }
-
-    return `${product.name} video ${index + 1}`;
-  }
-
-  const media = [];
-
-  images.forEach((item, index) => {
-    const url = getImageUrl(item);
-
-    if (!url) return;
-
-    media.push({
-      type: 'image',
-      url,
-      alt: getImageAlt(item, index),
-      index
-    });
-  });
-
-  videos.forEach((item, index) => {
-    const url = getVideoUrl(item);
-
-    if (!url) return;
-
-    media.push({
-      type: 'video',
-      url,
-      title: getVideoTitle(item, index),
-      poster:
-        typeof item === 'object'
-          ? item?.poster || item?.thumbnail || ''
-          : ''
-    });
-  });
+  const media =
+    window.RaykelsCatalogAPI.getProductMedia(product);
 
   const mediaEmpty =
     document.querySelector('[data-product-media-empty]');
@@ -235,12 +167,12 @@ async function loadProductPage() {
                 index === 0 ? 'active' : ''
               }"
               data-media-index="${index}"
-              aria-label="View ${getVideoTitle(item, index)}">
+              aria-label="View ${item.title || `Video ${index + 1}`}">
               ${
                 item.poster
                   ? `<img
                       src="${item.poster}"
-                      alt="${getVideoTitle(item, index)}">`
+                      alt="${item.title || `Video ${index + 1}`}">`
                   : `<span class="product-thumbnail-video-icon">▶</span>`
               }
               <span class="product-thumbnail-video-label">VIDEO</span>
