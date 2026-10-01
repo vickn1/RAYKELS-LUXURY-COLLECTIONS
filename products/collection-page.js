@@ -22,52 +22,9 @@
   }
 
   function getMedia(product) {
-    if (window.RaykelsCatalogAPI?.getProductMedia) {
-      return window.RaykelsCatalogAPI.getProductMedia(product);
-    }
-
-    const media = [];
-
-    const images = Array.isArray(product?.images)
-      ? product.images
+    return window.RaykelsCatalogAPI?.getProductMedia
+      ? window.RaykelsCatalogAPI.getProductMedia(product)
       : [];
-
-    const videos = Array.isArray(product?.videos)
-      ? product.videos
-      : [];
-
-    images.forEach((item, index) => {
-      const url = typeof item === 'string'
-        ? item
-        : item?.url;
-
-      if (!url) return;
-
-      media.push({
-        type: 'image',
-        url,
-        alt: item?.alt || product?.name || 'RAYKELS product image',
-        id: item?.id || `${product.id}-image-${index}`
-      });
-    });
-
-    videos.forEach((item, index) => {
-      const url = typeof item === 'string'
-        ? item
-        : item?.url;
-
-      if (!url) return;
-
-      media.push({
-        type: 'video',
-        url,
-        poster: item?.poster || item?.thumbnail || '',
-        title: item?.title || product?.name || 'RAYKELS product video',
-        id: item?.id || `${product.id}-video-${index}`
-      });
-    });
-
-    return media;
   }
 
   function getPrimaryMedia(product) {

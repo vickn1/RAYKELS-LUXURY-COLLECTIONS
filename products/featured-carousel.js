@@ -41,53 +41,9 @@
   }
 
   function getMedia(product) {
-    if (window.RaykelsCatalogAPI?.getProductMedia) {
-      return window.RaykelsCatalogAPI.getProductMedia(product);
-    }
-
-    const media = [];
-
-    const images = Array.isArray(product?.images)
-      ? product.images
+    return window.RaykelsCatalogAPI?.getProductMedia
+      ? window.RaykelsCatalogAPI.getProductMedia(product)
       : [];
-
-    const videos = Array.isArray(product?.videos)
-      ? product.videos
-      : [];
-
-    images.forEach((item, index) => {
-      const url = typeof item === 'string'
-        ? item
-        : item?.url;
-
-      if (!url) return;
-
-      media.push({
-        id: item?.id || `${product.id}-image-${index}`,
-        type: 'image',
-        url,
-        alt: item?.alt || product?.name || 'RAYKELS product image',
-        title: item?.title || product?.name || ''
-      });
-    });
-
-    videos.forEach((item, index) => {
-      const url = typeof item === 'string'
-        ? item
-        : item?.url;
-
-      if (!url) return;
-
-      media.push({
-        id: item?.id || `${product.id}-video-${index}`,
-        type: 'video',
-        url,
-        title: item?.title || product?.name || 'RAYKELS product video',
-        poster: item?.poster || item?.thumbnail || ''
-      });
-    });
-
-    return media;
   }
 
   function createMedia(media, product) {

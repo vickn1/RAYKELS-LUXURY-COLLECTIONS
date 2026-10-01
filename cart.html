@@ -111,31 +111,12 @@ async function displayCart() {
   let total = 0;
 
   function getImage(product, variant) {
-    if (
-      variant?.imageIds?.length &&
-      Array.isArray(product.images)
-    ) {
-      const image =
-        product.images.find(
-          item =>
-            item?.id &&
-            variant.imageIds.includes(item.id)
-        );
-
-      if (image?.url) return image.url;
-    }
-
-    const first =
-      Array.isArray(product.images)
-        ? product.images[0]
+    const image =
+      window.RaykelsCatalogAPI?.getProductImageForVariant
+        ? window.RaykelsCatalogAPI.getProductImageForVariant(product, variant)
         : null;
 
-    if (typeof first === 'string') {
-      return first;
-    }
-
-    return first?.url ||
-      'assets/hero/hero.jpg';
+    return image?.url || 'assets/hero/hero.jpg';
   }
 
   function getVariantDetails(item) {

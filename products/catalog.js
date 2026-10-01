@@ -126,6 +126,20 @@ function getProductPrimaryMedia(product) {
   return getProductMedia(product)[0] || null;
 }
 
+function getProductImageForVariant(product, variant = null) {
+  const media = getProductMedia(product);
+
+  if (variant?.imageIds?.length) {
+    const matched = media.find(
+      item => item.type === 'image' && variant.imageIds.includes(item.id)
+    );
+
+    if (matched) return matched;
+  }
+
+  return media.find(item => item.type === 'image') || null;
+}
+
 function getProductsByCategory(category) {
   return window.RaykelsCatalog.filter(
     product => product.category === category
