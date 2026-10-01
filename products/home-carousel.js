@@ -51,55 +51,17 @@
   }
 
   function getProductMedia(product) {
-    const media = [];
+    const canonicalMedia =
+      window.RaykelsCatalogAPI?.getProductMedia
+        ? window.RaykelsCatalogAPI.getProductMedia(product)
+        : [];
 
-    const images = Array.isArray(product?.images)
-      ? product.images
-      : [];
-
-    const videos = Array.isArray(product?.videos)
-      ? product.videos
-      : [];
-
-    images.forEach((item, index) => {
-      const url = typeof item === 'string'
-        ? item
-        : item?.url;
-
-      if (!url) return;
-
-      media.push({
-        id: item?.id || `${product.id}-image-${index}`,
-        type: 'image',
-        url,
-        title: item?.title || product?.name || 'RAYKELS',
-        alt: item?.alt || product?.name || 'RAYKELS product',
-        productId: product.id,
-        productName: product.name,
-        category: product.category
-      });
-    });
-
-    videos.forEach((item, index) => {
-      const url = typeof item === 'string'
-        ? item
-        : item?.url;
-
-      if (!url) return;
-
-      media.push({
-        id: item?.id || `${product.id}-video-${index}`,
-        type: 'video',
-        url,
-        poster: item?.poster || item?.thumbnail || '',
-        title: item?.title || product?.name || 'RAYKELS',
-        productId: product.id,
-        productName: product.name,
-        category: product.category
-      });
-    });
-
-    return media;
+    return canonicalMedia.map(media => ({
+      ...media,
+      productId: product.id,
+      productName: product.name,
+      category: product.category
+    }));
   }
 
   function buildMediaPool(products) {
