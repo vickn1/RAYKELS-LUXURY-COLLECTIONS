@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Your Cart | RAYKELS LUXURY COLLECTIONS</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="logo">
+    <span>RAYKELS</span>
+    <small>LUXURY COLLECTIONS</small>
+  </div>
+
+  <nav class="main-nav">
+    <a href="index.html">Home</a>
+    <a href="hair.html">Hair</a>
+    <a href="bags.html">Bags</a>
+    <a href="shoes.html">Shoes</a>
+    <a href="children.html">Children</a>
+    <a href="wig-care.html">Wig Care</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+    <button class="menu-toggle" aria-label="Open menu">
+      ☰
+    </button>
+</header>
+
+<main>
+
+  <section class="catalogue-hero">
+    <p class="eyebrow">RAYKELS COLLECTION</p>
+    <h1>Your Cart</h1>
+    <p>
+      Review your selected pieces before proceeding to checkout.
+    </p>
+  </section>
+
+  <section class="cart-section">
+
+    <div data-cart-container>
+      <p>Loading cart...</p>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="products/catalog.js"></script>
+<script src="products/cart.js"></script>
+
+<script>
+async function displayCart() {
+  const container =
+    document.querySelector('[data-cart-container]');
+
+  if (!container) return;
+
+  const products =
+    await window.RaykelsCatalogAPI.loadCatalog();
+
+  const cart =
+    window.RaykelsCart.getCart();
+
+  if (!cart.length) {
+    container.innerHTML = `
+      <div class="empty-catalogue">
+        <h2>Your cart is empty</h2>
+        <p>
+          Add something beautiful from the RAYKELS collection.
+        </p>
+        <br>
+        <a href="index.html" class="btn btn-primary">
+          Continue Shopping
+        </a>
+      </div>
+    `;
+    return;
+  }
+
+  const items = cart
+    .map(item => {
+      const product =
+        products.find(p => p.id === item.productId);
+
+      if (!product) return null;
+
+      const variant =
+        window.RaykelsCart.getCartItemVariant(
+          item,
+          product
+        );
+
+      const price =
+        window.RaykelsCart.getCartItemPrice(item);
+
+      return {
+        ...item,
+        product,
+        variant,
+        price
+      };
+    })
+    .filter(Boolean);
+
+  let total = 0;
+
+  function getImage(product, variant) {
+    if (
+      variant?.imageIds?.length &&
+      Array.isArray(product.images)
+    ) {
+      const image =
+        product.images.find(
+          item =>
+            item?.id &&
+            variant.imageIds.includes(item.id)
+        );
+
+      if (image?.url) return image.url;
+    }
+
+    const first =
+      Array.isArray(product.images)
+        ? product.images[0]
+        : null;
+
+    if (typeof first === 'string') {
+      return first;
+    }
+
+    return first?.url ||
+      'assets/hero/hero.jpg';
+  }
+
+  function getVariantDetails(item) {
+    const variant = item.variant;
+
+    if (!variant) return '';
+
+    const details = [
+      variant.colour,
+      variant.size,
+      variant.length,
+      variant.material
+    ].filter(Boolean);
+
+    if (!details.length) {
+      return variant.name
+        ? `<p class="cart-variant">${variant.name}</p>`
+        : '';
+    }
+
+    return `
+      <p class="cart-variant">
+        ${variant.name ? `<strong>${variant.name}</strong><br>` : ''}
+        ${details.join(' · ')}
+      </p>
+    `;
+  }
+
+  const rows = items.map(item => {
+    const subtotal =
+      Number(item.price || 0) *
+      Number(item.quantity);
+
+    total += subtotal;
+
+    const cartKey =
+      item.cartItemKey ||
+      item.productId;
+
+    return `
+      <article class="cart-item">
+
+        <img
+          src="${getImage(item.product, item.variant)}"
+          alt="${item.product.name}"
+          class="cart-item-image"
+        >
+
+        <div class="cart-item-info">
+
+          <h2>${item.product.name}</h2>
+
+          ${getVariantDetails(item)}
+
+          <p>
+            ${window.RaykelsCatalogAPI.formatPrice(
+              item.price
+            )}
+          </p>
+
+          <div class="cart-quantity">
+
+            <button
+              type="button"
+              onclick="changeQuantity(
+                '${cartKey}',
+                ${item.quantity - 1}
+              )"
+              aria-label="Decrease quantity">
+              −
+            </button>
+
+            <span>${item.quantity}</span>
+
+            <button
+              type="button"
+              onclick="changeQuantity(
+                '${cartKey}',
+                ${item.quantity + 1}
+              )"
+              aria-label="Increase quantity">
+              +
+            </button>
+
+          </div>
+
+          <strong>
+            ${window.RaykelsCatalogAPI.formatPrice(
+              subtotal
+            )}
+          </strong>
+
+          <button
+            type="button"
+            class="cart-remove"
+            onclick="removeItem('${cartKey}')">
+            Remove
+          </button>
+
+        </div>
+
+      </article>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="cart-layout">
+
+      <div class="cart-items">
+        ${rows}
+      </div>
+
+      <aside class="cart-summary">
+
+        <p>Order Summary</p>
+
+        <h2>
+          ${window.RaykelsCatalogAPI.formatPrice(total)}
+        </h2>
+
+        <a
+          href="checkout.html"
+          class="btn btn-primary">
+          Proceed to Checkout
+        </a>
+
+        <a
+          href="index.html"
+          class="text-link">
+          ← Continue Shopping
+        </a>
+
+      </aside>
+
+    </div>
+  `;
+}
+
+function changeQuantity(cartItemKey, quantity) {
+  if (quantity < 1) {
+    window.RaykelsCart.removeFromCart(cartItemKey);
+  } else {
+    window.RaykelsCart.updateCartQuantity(
+      cartItemKey,
+      quantity
+    );
+  }
+
+  displayCart();
+}
+
+function removeItem(cartItemKey) {
+  window.RaykelsCart.removeFromCart(cartItemKey);
+  displayCart();
+}
+
+displayCart();
+</script>
+
+<script src="assets/tracking/tracking.js"></script>
+<script src="script.js"></script>
+
+<footer class="site-footer">
+  <div>
+    <strong>RAYKELS LUXURY COLLECTIONS</strong>
+    <p>HiG 027 FATI ABUBAKAR Block, Wuye Ultramodern Market, Abuja</p>
+  </div>
+
+  <div>
+    <p><strong>WhatsApp</strong><br>
+    <a href="https://wa.me/2347057139583">07057193583</a></p>
+
+    <p><strong>Instagram</strong><br>
+    <a href="https://www.instagram.com/raykelsluxuryhair/" target="_blank" rel="noopener">
+      @raykelsluxuryhair
+    </a></p>
+
+    <p><strong>Facebook</strong><br>
+    <a href="https://www.facebook.com/share/19LdQPjgKA/" target="_blank" rel="noopener">
+      RAYKELS LUXURY COLLECTIONS
+    </a></p>
+  </div>
+
+  <p>© 2026 RAYKELS LUXURY COLLECTIONS. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

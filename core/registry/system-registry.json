@@ -1,0 +1,174 @@
+{
+  "registryVersion": "1.0.0",
+  "registryId": "raykels.system",
+  "status": "active",
+
+  "modules": [
+    {
+      "id": "core",
+      "name": "Core Platform",
+      "owner": "core",
+      "status": "active"
+    },
+    {
+      "id": "admin",
+      "name": "Admin",
+      "owner": "admin",
+      "status": "active"
+    },
+    {
+      "id": "developer",
+      "name": "Developer",
+      "owner": "developer",
+      "status": "planned"
+    },
+    {
+      "id": "wizard",
+      "name": "Wizard",
+      "owner": "developer",
+      "status": "planned"
+    },
+    {
+      "id": "products",
+      "name": "Products",
+      "owner": "products",
+      "status": "active",
+      "api": "/api/products"
+    },
+    {
+      "id": "orders",
+      "name": "Orders",
+      "owner": "orders",
+      "status": "active",
+      "api": "/api/orders"
+    },
+    {
+      "id": "inventory",
+      "name": "Inventory",
+      "owner": "inventory",
+      "status": "active"
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics",
+      "owner": "analytics",
+      "status": "active",
+      "api": "/api/analytics/events"
+    },
+    {
+      "id": "settings",
+      "name": "Settings",
+      "owner": "settings",
+      "status": "active"
+    },
+    {
+      "id": "front_page",
+      "name": "Front Page",
+      "owner": "front_page",
+      "status": "active"
+    },
+    {
+      "id": "experience",
+      "name": "Experience",
+      "owner": "experience",
+      "status": "planned"
+    }
+  ],
+
+  "capabilities": [
+    {
+      "id": "products.catalog.read",
+      "owner": "products",
+      "permissionLevel": 0,
+      "status": "active"
+    },
+    {
+      "id": "products.manage",
+      "owner": "products",
+      "permissionLevel": 3,
+      "status": "active"
+    },
+    {
+      "id": "products.media.video",
+      "owner": "products",
+      "permissionLevel": 3,
+      "status": "active"
+    },
+    {
+      "id": "orders.manage",
+      "owner": "orders",
+      "permissionLevel": 3,
+      "status": "active"
+    },
+    {
+      "id": "inventory.manage",
+      "owner": "inventory",
+      "permissionLevel": 3,
+      "status": "active"
+    },
+    {
+      "id": "settings.manage",
+      "owner": "settings",
+      "permissionLevel": 3,
+      "status": "active"
+    },
+    {
+      "id": "front_page.manage",
+      "owner": "front_page",
+      "permissionLevel": 4,
+      "status": "active"
+    },
+    {
+      "id": "experience.manage",
+      "owner": "experience",
+      "permissionLevel": 4,
+      "status": "planned"
+    }
+  ],
+
+  "contracts": [
+    {
+      "id": "products.catalog",
+      "owner": "products",
+      "type": "api",
+      "method": "GET",
+      "path": "/api/products",
+      "status": "active"
+    },
+    {
+      "id": "products.media.normalized",
+      "owner": "products",
+      "type": "frontend-contract",
+      "source": "products/catalog.js",
+      "function": "getProductMedia",
+      "status": "active"
+    }
+  ],
+
+  "settings": [
+    {
+      "id": "front_page.hero.rotation_seconds",
+      "name": "Hero Rotation Interval",
+      "owner": "front_page",
+      "permissionLevel": 4,
+      "type": "number",
+      "status": "active"
+    },
+    {
+      "id": "settings.social.instagram",
+      "name": "Instagram",
+      "owner": "settings",
+      "permissionLevel": 3,
+      "type": "url",
+      "status": "active"
+    },
+    {
+      "id": "settings.accessibility.reduced_motion",
+      "name": "Reduced Motion",
+      "owner": "settings",
+      "permissionLevel": 3,
+      "type": "boolean",
+      "status": "planned"
+    }
+  ]
+}

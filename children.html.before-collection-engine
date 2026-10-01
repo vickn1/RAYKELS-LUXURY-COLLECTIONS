@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Children | RAYKELS LUXURY COLLECTIONS</title>
+  <meta name="description" content="Explore premium children's clothing, shoes, sandals and accessories from RAYKELS LUXURY COLLECTIONS.">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="logo">
+    <span>RAYKELS</span>
+    <small>LUXURY COLLECTIONS</small>
+  </div>
+
+  <nav class="main-nav">
+    <a href="index.html">Home</a>
+    <a href="hair.html">Hair</a>
+    <a href="bags.html">Bags</a>
+    <a href="shoes.html">Shoes</a>
+    <a href="children.html">Children</a>
+    <a href="wig-care.html">Wig Care</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+    <button class="menu-toggle" aria-label="Open menu">
+      ☰
+    </button>
+</header>
+
+<main>
+
+  <section class="catalogue-hero">
+    <p class="eyebrow">RAYKELS KIDS</p>
+    <h1>Luxury for Little Ones</h1>
+    <p>
+      Discover beautiful children's clothing, shoes,
+      sandals and carefully selected luxury accessories.
+    </p>
+  </section>
+
+  <section class="catalogue-section">
+
+    <div class="catalogue-filters">
+      <button type="button" data-child-category="all">All</button>
+      <button type="button" data-child-category="clothing">Clothing</button>
+      <button type="button" data-child-category="shoes">Shoes</button>
+      <button type="button" data-child-category="sandals">Sandals</button>
+      <button type="button" data-child-category="accessories">Accessories</button>
+    </div>
+
+    <div
+      class="product-grid"
+      data-product-grid>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="products/catalog.js"></script>
+<script src="products/cart.js"></script>
+
+<script>
+async function displayChildrenProducts(category = 'all') {
+  const products = await window.RaykelsCatalogAPI.loadCatalog();
+
+  let childProducts = products.filter(
+    product => product.category === 'children'
+  );
+
+  if (category !== 'all') {
+    childProducts = childProducts.filter(
+      product => product.subcategory === category
+    );
+  }
+
+  const grid = document.querySelector('[data-product-grid]');
+
+  if (!grid) return;
+
+  if (!childProducts.length) {
+    grid.innerHTML = `
+      <div class="empty-catalogue">
+        <h2>RAYKELS KIDS</h2>
+        <p>Our latest children's collection will appear here soon.</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = childProducts.map(product => `
+    <article class="product-card">
+
+      <a href="product.html?id=${encodeURIComponent(product.id)}"
+         class="product-image-link">
+
+        <img
+          src="${product.images?.[0] || 'assets/hero/hero.jpg'}"
+          alt="${product.name}"
+          class="product-image"
+        >
+
+      </a>
+
+      <div class="product-card-content">
+
+        <h2>${product.name}</h2>
+
+        <p>
+          ${product.description || ''}
+        </p>
+
+        <strong>
+          ${window.RaykelsCatalogAPI.formatPrice(product.price)}
+        </strong>
+
+        <button
+          type="button"
+          class="add-to-cart"
+          data-product-id="${product.id}">
+          Add to Cart
+        </button>
+
+      </div>
+
+    </article>
+  `).join('');
+}
+
+document.querySelectorAll('[data-child-category]').forEach(button => {
+  button.addEventListener('click', () => {
+    displayChildrenProducts(button.dataset.childCategory);
+  });
+});
+
+displayChildrenProducts();
+
+document.addEventListener("click", event => {
+  const button = event.target.closest(".add-to-cart");
+  if (!button) return;
+
+  const productId = button.dataset.productId;
+  window.RaykelsCart.addToCart(productId, 1);
+
+  const product = window.RaykelsCatalogAPI.getProductById(productId);
+
+  if (typeof fbq === "function" && product) {
+    fbq("track", "AddToCart", {
+      content_ids: [product.id],
+      content_name: product.name,
+      content_type: "product",
+      value: Number(product.price),
+      currency: "NGN"
+    });
+  }
+
+  if (typeof gtag === "function" && product) {
+    gtag("event", "add_to_cart", {
+      currency: "NGN",
+      value: Number(product.price),
+      items: [{
+        item_id: product.id,
+        item_name: product.name,
+        price: Number(product.price),
+        quantity: 1
+      }]
+    });
+  }
+
+  button.textContent = "Added ✓";
+  setTimeout(() => button.textContent = "Add to Cart", 1500);
+});
+
+</script>
+
+<script src="assets/tracking/tracking.js"></script>
+<script src="script.js"></script>
+
+<footer class="site-footer">
+  <div>
+    <strong>RAYKELS LUXURY COLLECTIONS</strong>
+    <p>HiG 027 FATI ABUBAKAR Block, Wuye Ultramodern Market, Abuja</p>
+  </div>
+
+  <div>
+    <p><strong>WhatsApp</strong><br>
+    <a href="https://wa.me/2347057139583">07057193583</a></p>
+
+    <p><strong>Instagram</strong><br>
+    <a href="https://www.instagram.com/raykelsluxuryhair/" target="_blank" rel="noopener">
+      @raykelsluxuryhair
+    </a></p>
+
+    <p><strong>Facebook</strong><br>
+    <a href="https://www.facebook.com/share/19LdQPjgKA/" target="_blank" rel="noopener">
+      RAYKELS LUXURY COLLECTIONS
+    </a></p>
+  </div>
+
+  <p>© 2026 RAYKELS LUXURY COLLECTIONS. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

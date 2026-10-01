@@ -1,0 +1,46 @@
+{
+  "id": "product-id",
+  "name": "Product Name",
+  "brand": "",
+  "category": "hair",
+  "subcategory": "bone-straight",
+  "description": "Product description",
+  "sku": "",
+  "currency": "NGN",
+  "pricing": {
+    "price": 0,
+    "salePrice": null
+  },
+  "images": [],
+  "attributes": {
+    "colours": [],
+    "sizes": [],
+    "lengths": [],
+    "materials": [],
+    "ageRanges": []
+  },
+  "variants": [
+    {
+      "id": "variant-1",
+      "name": "Default",
+      "sku": "",
+      "colour": "",
+      "size": "",
+      "length": "",
+      "material": "",
+      "price": 0,
+      "salePrice": null,
+      "stock": 0,
+      "imageIds": [],
+      "available": true
+    }
+  ],
+  "inventory": {
+    "stock": 0,
+    "trackStock": true
+  },
+  "available": true,
+  "featured": false,
+  "published": true,
+  "videos": []
+}

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Received | RAYKELS LUXURY COLLECTIONS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+
+  <div class="logo">
+    <span>RAYKELS</span>
+    <small>LUXURY COLLECTIONS</small>
+  </div>
+
+  <nav class="main-nav">
+    <a href="index.html">Home</a>
+    <a href="hair.html">Hair</a>
+    <a href="bags.html">Bags</a>
+    <a href="shoes.html">Shoes</a>
+    <a href="children.html">Children</a>
+    <a href="wig-care.html">Wig Care</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+
+  <button class="menu-toggle" aria-label="Open menu">
+    ☰
+  </button>
+
+</header>
+
+
+<main>
+
+<section class="catalogue-hero">
+
+  <p class="eyebrow">
+    RAYKELS COLLECTION
+  </p>
+
+  <h1>
+    Order Received
+  </h1>
+
+  <p data-order-status>
+    Loading your order...
+  </p>
+
+</section>
+
+
+<section class="checkout-section">
+
+  <div class="checkout-layout">
+
+    <div class="checkout-block">
+
+      <p class="eyebrow">
+        ORDER CONFIRMATION
+      </p>
+
+      <h2>
+        Thank you for shopping with Raykels.
+      </h2>
+
+      <p>
+        Your order has been received successfully.
+      </p>
+
+      <div class="checkout-summary">
+
+        <p>
+          Order Reference
+        </p>
+
+        <h2 data-order-id>
+          Loading...
+        </h2>
+
+        <p data-order-total>
+          Loading total...
+        </p>
+
+        <p data-order-payment>
+          Loading payment method...
+        </p>
+
+        <p data-order-fulfilment>
+          Loading fulfilment method...
+        </p>
+
+      </div>
+
+      <p>
+        Raykels will contact you using the phone number
+        provided during checkout to continue processing
+        your order.
+      </p>
+
+      <p>
+        <a
+          href="index.html"
+          class="btn btn-primary"
+        >
+          Continue Shopping
+        </a>
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<script>
+
+async function loadOrder() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const orderId =
+    params.get('order');
+
+
+  const status =
+    document.querySelector(
+      '[data-order-status]'
+    );
+
+  const idElement =
+    document.querySelector(
+      '[data-order-id]'
+    );
+
+  const totalElement =
+    document.querySelector(
+      '[data-order-total]'
+    );
+
+  const paymentElement =
+    document.querySelector(
+      '[data-order-payment]'
+    );
+
+  const fulfilmentElement =
+    document.querySelector(
+      '[data-order-fulfilment]'
+    );
+
+
+  if (!orderId) {
+
+    status.textContent =
+      'No order reference was provided.';
+
+    idElement.textContent =
+      'Unavailable';
+
+    totalElement.textContent =
+      '';
+
+    paymentElement.textContent =
+      '';
+
+    fulfilmentElement.textContent =
+      '';
+
+    return;
+
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        `/api/orders/${encodeURIComponent(orderId)}`
+      );
+
+
+    const order =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        order.error ||
+        'Order could not be found.'
+      );
+
+    }
+
+
+    idElement.textContent =
+      order.id;
+
+
+    status.textContent =
+      'Your order has been received successfully.';
+
+
+    const total =
+      Number(
+        order.totals?.total || 0
+      );
+
+
+    totalElement.textContent =
+      `Total: ${new Intl.NumberFormat(
+        'en-NG',
+        {
+          style: 'currency',
+          currency:
+            order.totals?.currency || 'NGN',
+          maximumFractionDigits: 0
+        }
+      ).format(total)}`;
+
+
+    const paymentMethod =
+      order.payment?.method || 'Not specified';
+
+
+    paymentElement.textContent =
+      `Payment: ${formatLabel(
+        paymentMethod
+      )}`;
+
+
+    const fulfilmentMethod =
+      order.fulfilment?.method ||
+      'Not specified';
+
+
+    fulfilmentElement.textContent =
+      `Fulfilment: ${formatLabel(
+        fulfilmentMethod
+      )}`;
+
+
+    /*
+      Clear the cart only after the backend has
+      confirmed that the order exists.
+    */
+
+    if (window.localStorage) {
+
+      localStorage.removeItem(
+        'raykels_cart'
+      );
+
+    }
+
+
+  } catch (error) {
+
+    console.error(
+      'Raykels order lookup failed:',
+      error
+    );
+
+
+    status.textContent =
+      'We could not load this order reference.';
+
+
+    idElement.textContent =
+      orderId;
+
+
+    totalElement.textContent =
+      'Please contact Raykels if you have already submitted your order.';
+
+
+    paymentElement.textContent =
+      '';
+
+
+    fulfilmentElement.textContent =
+      '';
+
+  }
+
+}
+
+
+function formatLabel(value) {
+
+  return String(value)
+    .replaceAll('_', ' ')
+    .replace(
+      /\b\w/g,
+      character =>
+        character.toUpperCase()
+    );
+
+}
+
+
+loadOrder();
+
+</script>
+
+
+<script src="script.js"></script>
+
+
+<footer class="site-footer">
+
+  <div>
+
+    <strong>
+      RAYKELS LUXURY COLLECTIONS
+    </strong>
+
+    <p>
+      HiG 027 FATI ABUBAKAR Block,
+      Wuye Ultramodern Market, Abuja
+    </p>
+
+  </div>
+
+
+  <div>
+
+    <p>
+
+      <strong>
+        WhatsApp
+      </strong>
+
+      <br>
+
+      <a href="https://wa.me/2347057139583">
+        07057193583
+      </a>
+
+    </p>
+
+
+    <p>
+
+      <strong>
+        Instagram
+      </strong>
+
+      <br>
+
+      <a
+        href="https://www.instagram.com/raykelsluxuryhair/"
+        target="_blank"
+        rel="noopener"
+      >
+        @raykelsluxuryhair
+      </a>
+
+    </p>
+
+
+    <p>
+
+      <strong>
+        Facebook
+      </strong>
+
+      <br>
+
+      <a
+        href="https://www.facebook.com/share/19LdQPjgKA/"
+        target="_blank"
+        rel="noopener"
+      >
+        RAYKELS LUXURY COLLECTIONS
+      </a>
+
+    </p>
+
+  </div>
+
+
+  <p>
+    © 2026 RAYKELS LUXURY COLLECTIONS.
+    All rights reserved.
+  </p>
+
+</footer>
+
+</body>
+</html>

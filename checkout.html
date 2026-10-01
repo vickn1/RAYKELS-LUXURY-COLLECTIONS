@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout | RAYKELS LUXURY COLLECTIONS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="logo">
+    <span>RAYKELS</span>
+    <small>LUXURY COLLECTIONS</small>
+  </div>
+
+  <nav class="main-nav">
+    <a href="index.html">Home</a>
+    <a href="hair.html">Hair</a>
+    <a href="bags.html">Bags</a>
+    <a href="shoes.html">Shoes</a>
+    <a href="children.html">Children</a>
+    <a href="wig-care.html">Wig Care</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+
+  <button class="menu-toggle" aria-label="Open menu">
+    ☰
+  </button>
+</header>
+
+<main>
+
+<section class="catalogue-hero">
+  <p class="eyebrow">RAYKELS COLLECTION</p>
+  <h1>Checkout</h1>
+  <p>Complete your details and choose how you would like to receive your order.</p>
+</section>
+
+<section class="checkout-section">
+
+<div class="checkout-layout">
+
+<form class="checkout-form" id="checkout-form">
+
+<div class="checkout-block">
+  <p class="eyebrow">01 — CONTACT</p>
+  <h2>Your Details</h2>
+
+  <label>
+    Full Name
+    <input type="text" name="name" required autocomplete="name">
+  </label>
+
+  <label>
+    WhatsApp / Phone Number
+    <input type="tel" name="phone" required autocomplete="tel">
+  </label>
+
+  <label>
+    Email Address
+    <input type="email" name="email" autocomplete="email">
+  </label>
+</div>
+
+
+<div class="checkout-block">
+
+  <p class="eyebrow">02 — FULFILMENT</p>
+  <h2>How would you like to receive your order?</h2>
+
+  <label class="payment-option">
+    <input
+      type="radio"
+      name="fulfilment"
+      value="home_delivery"
+      required
+    >
+    <span>
+      <strong>Home Delivery</strong>
+      <small>Have your order delivered to your address.</small>
+    </span>
+  </label>
+
+  <label class="payment-option">
+    <input
+      type="radio"
+      name="fulfilment"
+      value="office_pickup"
+    >
+    <span>
+      <strong>Office Pickup</strong>
+      <small>Arrange pickup from the Raykels office.</small>
+    </span>
+  </label>
+
+</div>
+
+
+<div class="checkout-block" id="delivery-details">
+
+  <p class="eyebrow">03 — DELIVERY</p>
+  <h2>Delivery Details</h2>
+
+  <label>
+    Delivery Address
+    <textarea name="address" rows="4"></textarea>
+  </label>
+
+  <label>
+    City
+    <input type="text" name="city">
+  </label>
+
+  <label>
+    State
+    <input type="text" name="state">
+  </label>
+
+  <label>
+    Order Notes
+    <textarea name="notes" rows="3"></textarea>
+  </label>
+
+</div>
+
+
+<div class="checkout-block" id="pickup-details" hidden>
+
+  <p class="eyebrow">03 — PICKUP</p>
+  <h2>Office Pickup</h2>
+
+  <p>
+    After placing your order, Raykels will contact you to arrange
+    your pickup details.
+  </p>
+
+  <label>
+    Pickup Notes
+    <textarea name="pickupNotes" rows="3"></textarea>
+  </label>
+
+</div>
+
+
+<div class="checkout-block">
+
+  <p class="eyebrow">04 — PAYMENT</p>
+  <h2>Payment Method</h2>
+
+  <label class="payment-option">
+    <input
+      type="radio"
+      name="payment"
+      value="card"
+      required
+    >
+    <span>
+      <strong>Card</strong>
+      <small>Pay securely online.</small>
+    </span>
+  </label>
+
+  <label class="payment-option">
+    <input
+      type="radio"
+      name="payment"
+      value="transfer"
+    >
+    <span>
+      <strong>Bank Transfer</strong>
+      <small>Receive payment instructions after checkout.</small>
+    </span>
+  </label>
+
+  <label class="payment-option">
+    <input
+      type="radio"
+      name="payment"
+      value="cash"
+    >
+    <span>
+      <strong>Cash</strong>
+      <small>Payment arrangement with Raykels.</small>
+    </span>
+  </label>
+
+</div>
+
+
+<button
+  type="submit"
+  class="btn btn-primary checkout-submit"
+>
+  Place Order
+</button>
+
+<p
+  id="checkout-error"
+  role="alert"
+  aria-live="polite"
+  hidden
+></p>
+
+</form>
+
+
+<aside
+  class="checkout-summary"
+  data-checkout-summary
+>
+  <p>Order Summary</p>
+  <h2>Loading...</h2>
+</aside>
+
+</div>
+
+</section>
+
+</main>
+
+
+<script src="products/catalog.js"></script>
+<script src="products/cart.js"></script>
+<script src="assets/payment/payment.js"></script>
+
+<script>
+
+let checkoutCart = [];
+
+
+async function applyPaymentConfig() {
+
+  try {
+
+    const config =
+      await window.RaykelsPayment.loadPaymentConfig();
+
+    document
+      .querySelectorAll('input[name="payment"]')
+      .forEach(input => {
+
+        const enabled =
+          input.value === 'card'
+            ? config.cardEnabled
+            : input.value === 'transfer'
+              ? config.transferEnabled
+              : input.value === 'cash'
+                ? config.cashEnabled
+                : true;
+
+        input.disabled = !enabled;
+
+        if (!enabled) {
+          input.checked = false;
+        }
+
+      });
+
+  } catch (error) {
+
+    console.error(
+      'Payment configuration could not be loaded:',
+      error
+    );
+
+  }
+}
+
+
+function updateFulfilmentFields() {
+
+  const selected =
+    document.querySelector(
+      'input[name="fulfilment"]:checked'
+    );
+
+  const deliveryDetails =
+    document.querySelector('#delivery-details');
+
+  const pickupDetails =
+    document.querySelector('#pickup-details');
+
+  const address =
+    document.querySelector('[name="address"]');
+
+  const city =
+    document.querySelector('[name="city"]');
+
+  const state =
+    document.querySelector('[name="state"]');
+
+  if (!selected) {
+
+    deliveryDetails.hidden = false;
+    pickupDetails.hidden = true;
+
+    address.required = true;
+    city.required = true;
+    state.required = true;
+
+    return;
+  }
+
+  if (selected.value === 'home_delivery') {
+
+    deliveryDetails.hidden = false;
+    pickupDetails.hidden = true;
+
+    address.required = true;
+    city.required = true;
+    state.required = true;
+
+  } else {
+
+    deliveryDetails.hidden = true;
+    pickupDetails.hidden = false;
+
+    address.required = false;
+    city.required = false;
+    state.required = false;
+
+  }
+
+}
+
+
+function getCheckoutProducts() {
+
+  return checkoutCart
+    .map(item => {
+
+      const product =
+        window.RaykelsCatalogAPI.getProductById(
+          item.productId
+        );
+
+      if (!product) return null;
+
+      const variant =
+        window.RaykelsCart.getCartItemVariant(
+          item,
+          product
+        );
+
+      const price =
+        window.RaykelsCart.getCartItemPrice(
+          item
+        );
+
+      return {
+        item,
+        product,
+        variant,
+        price: Number(price || 0)
+      };
+
+    })
+    .filter(Boolean);
+
+}
+
+
+async function loadCheckout() {
+
+  await window.RaykelsCatalogAPI.loadCatalog();
+
+  checkoutCart =
+    window.RaykelsCart.getCart();
+
+  const summary =
+    document.querySelector(
+      '[data-checkout-summary]'
+    );
+
+  if (!checkoutCart.length) {
+
+    summary.innerHTML = `
+      <p>Your cart is empty.</p>
+      <a href="index.html">
+        Continue Shopping
+      </a>
+    `;
+
+    return false;
+  }
+
+
+  const products =
+    getCheckoutProducts();
+
+
+  let total = 0;
+
+
+  const items =
+    products
+      .map(entry => {
+
+        const {
+          item,
+          product,
+          variant,
+          price
+        } = entry;
+
+        const subtotal =
+          price * Number(item.quantity);
+
+        total += subtotal;
+
+
+        const variantText =
+          variant
+            ? [
+                variant.name,
+                variant.colour,
+                variant.size,
+                variant.length,
+                variant.material
+              ]
+                .filter(Boolean)
+                .join(' · ')
+            : '';
+
+
+        return `
+          <div class="checkout-summary-item">
+
+            <span>
+              ${product.name} × ${item.quantity}
+
+              ${
+                variantText
+                  ? `<small>${variantText}</small>`
+                  : ''
+              }
+            </span>
+
+            <strong>
+              ${window.RaykelsCatalogAPI.formatPrice(
+                subtotal
+              )}
+            </strong>
+
+          </div>
+        `;
+
+      })
+      .join('');
+
+
+  summary.innerHTML = `
+
+    <p>Order Summary</p>
+
+    <div class="checkout-summary-items">
+      ${items}
+    </div>
+
+    <div class="checkout-total">
+
+      <span>Total</span>
+
+      <strong>
+        ${window.RaykelsCatalogAPI.formatPrice(total)}
+      </strong>
+
+    </div>
+
+  `;
+
+
+  return true;
+}
+
+
+function trackCheckoutStart() {
+
+  if (!checkoutCart.length) return;
+
+  const products =
+    getCheckoutProducts();
+
+
+  const total =
+    products.reduce(
+      (sum, entry) =>
+        sum +
+        entry.price *
+        Number(entry.item.quantity),
+      0
+    );
+
+
+  const trackingProducts =
+    products.map(entry => {
+
+      const variant =
+        entry.variant;
+
+      return {
+
+        item_id:
+          entry.product.id,
+
+        item_name:
+          entry.product.name,
+
+        item_variant:
+          variant?.name || '',
+
+        price:
+          Number(entry.price || 0),
+
+        quantity:
+          Number(entry.item.quantity)
+
+      };
+
+    });
+
+
+  if (typeof fbq === 'function') {
+
+    fbq('track', 'InitiateCheckout', {
+
+      content_ids:
+        trackingProducts.map(
+          item => item.item_id
+        ),
+
+      content_type: 'product',
+
+      value:
+        Number(total),
+
+      currency:
+        'NGN',
+
+      num_items:
+        trackingProducts.reduce(
+          (sum, item) =>
+            sum + item.quantity,
+          0
+        )
+
+    });
+
+  }
+
+
+  if (typeof gtag === 'function') {
+
+    gtag('event', 'begin_checkout', {
+
+      currency: 'NGN',
+
+      value: Number(total),
+
+      items: trackingProducts
+
+    });
+
+  }
+
+}
+
+
+async function submitOrder(event) {
+
+  event.preventDefault();
+
+
+  const form =
+    event.currentTarget;
+
+  const errorBox =
+    document.querySelector('#checkout-error');
+
+  const submitButton =
+    form.querySelector(
+      '.checkout-submit'
+    );
+
+
+  errorBox.hidden = true;
+  errorBox.textContent = '';
+
+
+  if (!checkoutCart.length) {
+
+    errorBox.textContent =
+      'Your cart is empty.';
+
+    errorBox.hidden = false;
+
+    return;
+
+  }
+
+
+  const formData =
+    new FormData(form);
+
+
+  const fulfilmentMethod =
+    formData.get('fulfilment');
+
+
+  const paymentMethod =
+    formData.get('payment');
+
+
+  if (!fulfilmentMethod) {
+
+    errorBox.textContent =
+      'Please choose how you would like to receive your order.';
+
+    errorBox.hidden = false;
+
+    return;
+
+  }
+
+
+  if (!paymentMethod) {
+
+    errorBox.textContent =
+      'Please choose a payment method.';
+
+    errorBox.hidden = false;
+
+    return;
+
+  }
+
+
+  const items =
+    checkoutCart.map(item => ({
+
+      productId:
+        item.productId,
+
+      variantId:
+        item.variantId || null,
+
+      quantity:
+        Number(item.quantity)
+
+    }));
+
+
+  const orderPayload = {
+
+    customer: {
+
+      name:
+        String(formData.get('name') || '').trim(),
+
+      phone:
+        String(formData.get('phone') || '').trim(),
+
+      email:
+        String(formData.get('email') || '').trim()
+
+    },
+
+
+    fulfilment: {
+
+      method:
+        fulfilmentMethod
+
+    },
+
+
+    payment: {
+
+      method:
+        paymentMethod,
+
+      status:
+        'pending'
+
+    },
+
+
+    items
+
+  };
+
+
+  if (fulfilmentMethod === 'home_delivery') {
+
+    orderPayload.fulfilment.delivery = {
+
+      address:
+        String(formData.get('address') || '').trim(),
+
+      city:
+        String(formData.get('city') || '').trim(),
+
+      state:
+        String(formData.get('state') || '').trim(),
+
+      notes:
+        String(formData.get('notes') || '').trim()
+
+    };
+
+  }
+
+
+  if (fulfilmentMethod === 'office_pickup') {
+
+    orderPayload.fulfilment.pickup = {
+
+      location:
+        'RAYKELS LUXURY COLLECTIONS',
+
+      notes:
+        String(formData.get('pickupNotes') || '').trim()
+
+    };
+
+  }
+
+
+  submitButton.disabled = true;
+  submitButton.textContent =
+    'Placing Order...';
+
+
+  try {
+
+    const response =
+      await fetch('/api/orders', {
+
+        method: 'POST',
+
+        headers: {
+
+          'Content-Type':
+            'application/json'
+
+        },
+
+        body:
+          JSON.stringify(
+            orderPayload
+          )
+
+      });
+
+
+    const result =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        result.error ||
+        'The order could not be placed.'
+      );
+
+    }
+
+
+    console.log(
+      'Raykels order created:',
+      result
+    );
+
+
+    window.location.href =
+      `order-success.html?order=${
+        encodeURIComponent(result.id)
+      }`;
+
+
+  } catch (error) {
+
+    console.error(
+      'Raykels order submission failed:',
+      error
+    );
+
+
+    errorBox.textContent =
+      error.message ||
+      'Something went wrong while placing your order. Please try again.';
+
+    errorBox.hidden = false;
+
+
+    submitButton.disabled = false;
+
+    submitButton.textContent =
+      'Place Order';
+
+  }
+
+}
+
+
+document
+  .querySelectorAll(
+    'input[name="fulfilment"]'
+  )
+  .forEach(input => {
+
+    input.addEventListener(
+      'change',
+      updateFulfilmentFields
+    );
+
+  });
+
+
+document
+  .querySelector('#checkout-form')
+  .addEventListener(
+    'submit',
+    submitOrder
+  );
+
+
+updateFulfilmentFields();
+
+
+applyPaymentConfig()
+  .then(loadCheckout)
+  .then(trackCheckoutStart);
+
+</script>
+
+
+<script src="assets/tracking/tracking.js"></script>
+<script src="script.js"></script>
+
+
+<footer class="site-footer">
+
+  <div>
+
+    <strong>
+      RAYKELS LUXURY COLLECTIONS
+    </strong>
+
+    <p>
+      HiG 027 FATI ABUBAKAR Block,
+      Wuye Ultramodern Market, Abuja
+    </p>
+
+  </div>
+
+
+  <div>
+
+    <p>
+      <strong>WhatsApp</strong><br>
+
+      <a href="https://wa.me/2347057139583">
+        07057193583
+      </a>
+
+    </p>
+
+
+    <p>
+      <strong>Instagram</strong><br>
+
+      <a
+        href="https://www.instagram.com/raykelsluxuryhair/"
+        target="_blank"
+        rel="noopener"
+      >
+        @raykelsluxuryhair
+      </a>
+
+    </p>
+
+
+    <p>
+      <strong>Facebook</strong><br>
+
+      <a
+        href="https://www.facebook.com/share/19LdQPjgKA/"
+        target="_blank"
+        rel="noopener"
+      >
+        RAYKELS LUXURY COLLECTIONS
+      </a>
+
+    </p>
+
+  </div>
+
+
+  <p>
+    © 2026 RAYKELS LUXURY COLLECTIONS.
+    All rights reserved.
+  </p>
+
+</footer>
+
+</body>
+</html>

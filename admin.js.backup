@@ -1,0 +1,522 @@
+const sections = document.querySelectorAll('.admin-section');
+const navItems = document.querySelectorAll('.nav-item');
+const pageTitle = document.querySelector('#pageTitle');
+
+function showSection(id) {
+  sections.forEach(section => {
+    section.classList.toggle(
+      'active-section',
+      section.id === id
+    );
+  });
+
+  navItems.forEach(item => {
+    item.classList.toggle(
+      'active',
+      item.getAttribute('href') === `#${id}`
+    );
+  });
+
+  const activeItem =
+    document.querySelector(
+      `.nav-item[href="#${id}"]`
+    );
+
+  if (activeItem && pageTitle) {
+    pageTitle.textContent =
+      activeItem.textContent.trim();
+  }
+}
+
+navItems.forEach(item => {
+  item.addEventListener('click', event => {
+    event.preventDefault();
+
+    const id =
+      item.getAttribute('href').substring(1);
+
+    showSection(id);
+  });
+});
+
+const menuButton =
+  document.querySelector('#menuButton');
+
+const sidebar =
+  document.querySelector('.admin-sidebar');
+
+if (menuButton && sidebar) {
+  menuButton.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
+}
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    if (sidebar) {
+      sidebar.classList.remove('open');
+    }
+  });
+});
+
+async function loadAdminProducts() {
+  try {
+    const response =
+      await fetch('/api/products');
+
+    if (!response.ok) {
+      throw new Error(
+        `Products request failed: ${response.status}`
+      );
+    }
+
+    const data =
+      await response.json();
+
+    const products =
+      Array.isArray(data.products)
+        ? data.products
+        : [];
+
+    const productCount =
+      document.querySelector('#statProducts');
+
+    if (productCount) {
+      productCount.textContent =
+        products.length;
+    }
+
+    renderAdminProducts(products);
+
+  } catch (error) {
+    console.error(
+      'Could not load Raykels products:',
+      error
+    );
+  }
+}
+
+function renderAdminProducts(products) {
+  const container =
+    document.querySelector('#productsTable');
+
+  if (!container) return;
+
+  if (!products.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <strong>No products yet</strong>
+
+        <p>
+          Your products will appear here
+          after you add them.
+        </p>
+
+        <button
+          type="button"
+          class="admin-button primary"
+          id="firstProductButton">
+          Add Your First Product
+        </button>
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    products.map(product => `
+      <div class="product-admin-row">
+        <strong>${product.name}</strong>
+        <span>${product.category || ''}</span>
+      </div>
+    `).join('');
+}
+
+loadAdminProducts();
+
+const productForm =
+  document.querySelector('#productForm');
+
+if (productForm) {
+  productForm.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    const name =
+      document.querySelector('#productName').value.trim();
+
+    const category =
+      document.querySelector('#productCategory').value;
+
+    const subcategory =
+      document.querySelector('#productSubcategory').value.trim();
+
+    const brand =
+      document.querySelector('#productBrand').value.trim();
+
+    const sku =
+      document.querySelector('#productSku').value.trim();
+
+    const price =
+      Number(document.querySelector('#productPrice').value);
+
+    const salePriceValue =
+      document.querySelector('#productSalePrice').value;
+
+    const salePrice =
+      salePriceValue === ''
+        ? null
+        : Number(salePriceValue);
+
+    const stock =
+      Number(document.querySelector('#productStock').value) || 0;
+
+    const trackStock =
+      document.querySelector('#productTrackStock').checked;
+
+    const featured =
+      document.querySelector('#productFeatured').checked;
+
+    const description =
+      document.querySelector('#productDescription').value.trim();
+
+    const product = {
+      name,
+      brand,
+      category,
+      subcategory,
+      description,
+      sku,
+      currency: 'NGN',
+
+      pricing: {
+        price,
+        salePrice
+      },
+
+      images: [],
+
+      attributes: {
+        colours: [],
+        sizes: [],
+        lengths: [],
+        materials: [],
+        ageRanges: []
+      },
+
+      variants: [],
+
+      inventory: {
+        stock,
+        trackStock
+      },
+
+      available: stock > 0 || !trackStock,
+      featured,
+      published: true
+    };
+
+    try {
+      const response =
+        await fetch('/api/products', {
+          method: 'POST',
+
+          headers: {
+            'Content-Type': 'application/json'
+          },
+
+          body: JSON.stringify(product)
+        });
+
+      const result =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error || 'Could not save product.'
+        );
+      }
+
+      const imageInput =
+        document.querySelector('#productImages');
+
+      if (
+        imageInput &&
+        imageInput.files &&
+        imageInput.files.length
+      ) {
+        const formData =
+          new FormData();
+
+        Array.from(imageInput.files).forEach(
+          file => {
+            formData.append('images', file);
+          }
+        );
+
+        const uploadResponse =
+          await fetch(
+            `/api/uploads/products/${result.id}`,
+            {
+              method: 'POST',
+              body: formData
+            }
+          );
+
+        const uploadResult =
+          await uploadResponse.json();
+
+        if (!uploadResponse.ok) {
+          throw new Error(
+            uploadResult.error ||
+            'Product saved, but image upload failed.'
+          );
+        }
+      }
+
+      alert('Product saved successfully.');
+
+      productForm.reset();
+
+      loadAdminProducts();
+
+    } catch (error) {
+      console.error(error);
+
+      alert(error.message);
+    }
+  });
+}
+
+const addProductButton =
+  document.querySelector('#addProductButton');
+
+if (addProductButton) {
+  addProductButton.addEventListener('click', () => {
+    showSection('add-product');
+  });
+}
+
+const productCategory = document.querySelector('#productCategory');
+const dynamicProductFields = document.querySelector('#dynamicProductFields');
+
+function renderProductDetails(category) {
+  if (!dynamicProductFields) return;
+
+  if (category === 'hair') {
+    dynamicProductFields.innerHTML = `
+      <div class="detail-grid">
+        <div class="form-group">
+          <label>Hair Length</label>
+          <input type="text" id="detailLength" placeholder="e.g. 18 inches">
+        </div>
+        <div class="form-group">
+          <label>Colour</label>
+          <input type="text" id="detailColour" placeholder="e.g. Natural Black">
+        </div>
+        <div class="form-group">
+          <label>Texture</label>
+          <input type="text" id="detailTexture" placeholder="e.g. Bone Straight">
+        </div>
+        <div class="form-group">
+          <label>Density</label>
+          <input type="text" id="detailDensity" placeholder="e.g. 200%">
+        </div>
+      </div>
+    `;
+  } else if (category === 'wigs') {
+    dynamicProductFields.innerHTML = `
+      <div class="detail-grid">
+        <div class="form-group">
+          <label>Length</label>
+          <input type="text" id="detailLength" placeholder="e.g. 20 inches">
+        </div>
+        <div class="form-group">
+          <label>Colour</label>
+          <input type="text" id="detailColour" placeholder="e.g. Natural Black">
+        </div>
+        <div class="form-group">
+          <label>Style</label>
+          <input type="text" id="detailStyle" placeholder="e.g. Body Wave">
+        </div>
+        <div class="form-group">
+          <label>Density</label>
+          <input type="text" id="detailDensity" placeholder="e.g. 180%">
+        </div>
+      </div>
+    `;
+  } else if (category === 'bags') {
+    dynamicProductFields.innerHTML = `
+      <div class="detail-grid">
+        <div class="form-group">
+          <label>Colour</label>
+          <input type="text" id="detailColour" placeholder="e.g. Black">
+        </div>
+        <div class="form-group">
+          <label>Material</label>
+          <input type="text" id="detailMaterial" placeholder="e.g. Leather">
+        </div>
+        <div class="form-group">
+          <label>Size</label>
+          <input type="text" id="detailSize" placeholder="e.g. Medium">
+        </div>
+      </div>
+    `;
+  } else if (category === 'shoes') {
+    dynamicProductFields.innerHTML = `
+      <div class="detail-grid">
+        <div class="form-group">
+          <label>Size</label>
+          <input type="text" id="detailSize" placeholder="e.g. 39">
+        </div>
+        <div class="form-group">
+          <label>Colour</label>
+          <input type="text" id="detailColour" placeholder="e.g. Nude">
+        </div>
+        <div class="form-group">
+          <label>Material</label>
+          <input type="text" id="detailMaterial" placeholder="e.g. Leather">
+        </div>
+      </div>
+    `;
+  } else if (category === 'children') {
+    dynamicProductFields.innerHTML = `
+      <div class="detail-grid">
+        <div class="form-group">
+          <label>Size</label>
+          <input type="text" id="detailSize" placeholder="e.g. 4-5 years">
+        </div>
+        <div class="form-group">
+          <label>Colour</label>
+          <input type="text" id="detailColour" placeholder="e.g. Pink">
+        </div>
+        <div class="form-group">
+          <label>Age Range</label>
+          <input type="text" id="detailAgeRange" placeholder="e.g. 4-6 years">
+        </div>
+      </div>
+    `;
+  } else {
+    dynamicProductFields.innerHTML = '';
+  }
+}
+
+
+const productImages = document.querySelector('#productImages');
+const productImageSection = document.querySelector('#productImageSection');
+
+function updateProductDetails() {
+  const category = productCategory ? productCategory.value : '';
+
+  if (productImageSection) {
+    productImageSection.style.display = category ? 'block' : 'none';
+  }
+
+  if (category) {
+    renderProductDetails(category);
+  } else if (dynamicProductFields) {
+    dynamicProductFields.innerHTML = '';
+  }
+}
+
+if (productCategory) {
+  productCategory.addEventListener('change', updateProductDetails);
+}
+
+if (productImages) {
+  productImages.addEventListener('change', updateProductDetails);
+}
+
+
+const selectedProductFiles = document.querySelector('#selectedProductFiles');
+const uploadProductImages = document.querySelector('#uploadProductImages');
+
+if (productImages) {
+  productImages.addEventListener('change', function() {
+    if (!selectedProductFiles) return;
+
+    selectedProductFiles.innerHTML = '';
+
+    Array.from(this.files).forEach(file => {
+      const item = document.createElement('div');
+      item.className = 'selected-product-file';
+      item.textContent = file.name;
+      selectedProductFiles.appendChild(item);
+    });
+
+    if (uploadProductImages) {
+      uploadProductImages.style.display =
+        this.files.length ? 'inline-block' : 'none';
+    }
+  });
+}
+
+/* RAYKELS PENDING IMAGE UPLOAD */
+const pendingUploadId =
+  `pending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const pendingUploadedImages = [];
+
+if (productImages && uploadProductImages) {
+  uploadProductImages.addEventListener('click', async () => {
+    const files = Array.from(productImages.files || []);
+
+    if (!files.length) {
+      alert('Please select a product image first.');
+      return;
+    }
+
+    const formData = new FormData();
+
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+
+    uploadProductImages.disabled = true;
+    uploadProductImages.textContent = 'Uploading...';
+
+    try {
+      const response = await fetch(
+        `/api/uploads/pending/${pendingUploadId}`,
+        {
+          method: 'POST',
+          body: formData
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error || 'Image upload failed.'
+        );
+      }
+
+      if (Array.isArray(result.files)) {
+        pendingUploadedImages.push(...result.files);
+      }
+
+      alert(
+        `${result.files.length} image${result.files.length === 1 ? '' : 's'} uploaded successfully.`
+      );
+
+      if (dynamicProductFields && productCategory) {
+        renderProductDetails(productCategory.value);
+        if (document.querySelector('#productDetails')) {
+          document.querySelector('#productDetails').style.display = 'block';
+        }
+      }
+
+      productImages.value = '';
+      selectedProductFiles.innerHTML = '';
+      uploadProductImages.style.display = 'none';
+
+    } catch (error) {
+      console.error(error);
+      alert(error.message || 'Image upload failed.');
+    } finally {
+      uploadProductImages.disabled = false;
+      uploadProductImages.textContent = 'Upload Selected Images';
+    }
+  });
+}

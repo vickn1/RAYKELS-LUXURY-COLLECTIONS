@@ -1,0 +1,48 @@
+{
+  "template": "raykels-luxury",
+  "templateVersion": "2.0.0",
+  "brand": {
+    "name": "RAYKELS LUXURY COLLECTIONS",
+    "shortName": "RAYKELS"
+  },
+  "catalogue": {
+    "mainCategories": [
+      "hair",
+      "bags",
+      "shoes"
+    ],
+    "secondaryCategories": [
+      "children"
+    ]
+  },
+  "services": [
+    {
+      "id": "wig-care",
+      "name": "Wig Care & Revamping"
+    },
+    {
+      "id": "home-delivery",
+      "name": "Home Delivery"
+    },
+    {
+      "id": "consultation",
+      "name": "Product Consultation"
+    }
+  ],
+  "homepage": {
+    "heroEnabled": true,
+    "heroSource": "catalogue",
+    "autoRotate": true,
+    "rotationSeconds": 5,
+    "featuredProducts": {
+      "enabled": true,
+      "displayMode": "grid",
+      "autoRotate": true,
+      "rotationSeconds": 3,
+      "productIds": [],
+      "pinnedProductIds": []
+    },
+    "collectionsEnabled": true,
+    "servicesEnabled": true
+  }
+}

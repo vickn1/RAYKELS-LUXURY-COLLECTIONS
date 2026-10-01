@@ -1,0 +1,166 @@
+async function loadCatalog() {
+  try {
+    const response = await fetch('/api/products');
+
+    if (!response.ok) {
+      throw new Error(`Catalog request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    window.RaykelsCatalog = Array.isArray(data.products)
+      ? data.products.filter(product => product && product.published !== false)
+      : [];
+
+    console.log(
+      `Raykels catalog loaded: ${window.RaykelsCatalog.length} products`
+    );
+
+    return window.RaykelsCatalog;
+  } catch (error) {
+    console.error('Raykels catalog could not be loaded:', error);
+    window.RaykelsCatalog = [];
+    return [];
+  }
+}
+
+function formatPrice(price) {
+  const amount = Number(price);
+
+  if (!Number.isFinite(amount)) {
+    return 'Price on request';
+  }
+
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN',
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+function getProductPrice(product, variant = null) {
+  if (variant && Number.isFinite(Number(variant.price))) {
+    return Number(variant.price);
+  }
+
+  if (product?.pricing && Number.isFinite(Number(product.pricing.price))) {
+    return Number(product.pricing.price);
+  }
+
+  if (Number.isFinite(Number(product?.price))) {
+    return Number(product.price);
+  }
+
+  return null;
+}
+
+function getProductSalePrice(product, variant = null) {
+  if (
+    variant &&
+    variant.salePrice !== null &&
+    Number.isFinite(Number(variant.salePrice))
+  ) {
+    return Number(variant.salePrice);
+  }
+
+  if (
+    product?.pricing &&
+    product.pricing.salePrice !== null &&
+    Number.isFinite(Number(product.pricing.salePrice))
+  ) {
+    return Number(product.pricing.salePrice);
+  }
+
+  return null;
+}
+
+function getEffectivePrice(product, variant = null) {
+  const salePrice = getProductSalePrice(product, variant);
+  const regularPrice = getProductPrice(product, variant);
+
+  return salePrice !== null ? salePrice : regularPrice;
+}
+
+function getProductVariants(product) {
+  return Array.isArray(product?.variants)
+    ? product.variants
+    : [];
+}
+
+function getProductStock(product, variant = null) {
+  if (variant && Number.isFinite(Number(variant.stock))) {
+    return Number(variant.stock);
+  }
+
+  if (
+    product?.inventory &&
+    Number.isFinite(Number(product.inventory.stock))
+  ) {
+    return Number(product.inventory.stock);
+  }
+
+  if (Number.isFinite(Number(product?.stock))) {
+    return Number(product.stock);
+  }
+
+  return 0;
+}
+
+function isProductInStock(product, variant = null) {
+  if (variant?.available === false) {
+    return false;
+  }
+
+  if (product?.available === false) {
+    return false;
+  }
+
+  const inventory = product?.inventory;
+
+  if (inventory?.trackStock === false) {
+    return true;
+  }
+
+  return getProductStock(product, variant) > 0;
+}
+
+function getProductsByCategory(category) {
+  return window.RaykelsCatalog.filter(
+    product => product.category === category
+  );
+}
+
+function getProductsBySubcategory(category, subcategory) {
+  return window.RaykelsCatalog.filter(
+    product =>
+      product.category === category &&
+      product.subcategory === subcategory
+  );
+}
+
+function getFeaturedProducts() {
+  return window.RaykelsCatalog.filter(
+    product => product.featured === true
+  );
+}
+
+function getProductById(id) {
+  return window.RaykelsCatalog.find(
+    product => product.id === id
+  );
+}
+
+window.RaykelsCatalogAPI = {
+  loadCatalog,
+  formatPrice,
+  getProductPrice,
+  getProductSalePrice,
+  getEffectivePrice,
+  getProductVariants,
+  getProductStock,
+  isProductInStock,
+  getProductsByCategory,
+  getProductsBySubcategory,
+  getFeaturedProducts,
+  getProductById
+};

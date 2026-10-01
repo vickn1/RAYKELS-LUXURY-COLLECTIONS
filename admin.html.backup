@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raykels Admin</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="admin-app">
+<aside class="admin-sidebar">
+<div class="admin-brand">
+<span>RAYKELS</span>
+<small>LUXURY COLLECTIONS</small>
+</div>
+<nav class="admin-nav">
+<p class="nav-label">OVERVIEW</p>
+<a href="#dashboard" class="nav-item active"><span>⌂</span> Dashboard</a>
+<p class="nav-label">CATALOGUE</p>
+<a href="#products" class="nav-item"><span>▣</span> Products</a>
+<a href="#categories" class="nav-item"><span>◫</span> Categories</a>
+<a href="#inventory" class="nav-item"><span>▤</span> Inventory</a>
+<p class="nav-label">SALES</p>
+<a href="#orders" class="nav-item"><span>◉</span> Orders</a>
+<a href="#customers" class="nav-item"><span>♙</span> Customers</a>
+<p class="nav-label">MARKETING</p>
+<a href="#promotions" class="nav-item"><span>◇</span> Promotions</a>
+<p class="nav-label">WEBSITE</p>
+<a href="#hero" class="nav-item"><span>▱</span> Homepage</a>
+<a href="#services" class="nav-item"><span>✦</span> Services</a>
+<p class="nav-label">SYSTEM</p>
+<a href="#settings" class="nav-item"><span>⚙</span> Settings</a>
+</nav>
+<div class="admin-sidebar-footer"><a href="index.html">← View Store</a></div>
+</aside>
+<main class="admin-main">
+<header class="admin-header">
+<button type="button" class="menu-button" id="menuButton">☰</button>
+<div>
+<p class="admin-eyebrow">RAYKELS LUXURY COLLECTIONS</p>
+<h1 id="pageTitle">Dashboard</h1>
+</div>
+<div class="admin-header-actions"><span class="admin-status">● Admin</span></div>
+</header>
+<section id="dashboard" class="admin-section active-section">
+<p class="admin-eyebrow">OVERVIEW</p>
+<h2>Welcome back.</h2>
+<p>Manage your Raykels catalogue, orders and online store.</p>
+<div class="stats-grid">
+<div class="stat-card">
+<span class="stat-label">PRODUCTS</span>
+<strong id="statProducts">0</strong>
+<small>Total catalogue</small>
+</div>
+<div class="stat-card">
+<span class="stat-label">ORDERS</span>
+<strong id="statOrders">0</strong>
+<small>Orders received</small>
+</div>
+<div class="stat-card">
+<span class="stat-label">CUSTOMERS</span>
+<strong id="statCustomers">0</strong>
+<small>Customer records</small>
+</div>
+<div class="stat-card">
+<span class="stat-label">INVENTORY</span>
+<strong id="statInventory">0</strong>
+<small>Items in stock</small>
+</div>
+</div>
+
+
+</section>
+<section id="products" class="admin-section">
+
+<p class="admin-eyebrow">CATALOGUE</p>
+
+<div class="section-heading">
+<div>
+<h2>Products</h2>
+<p>Manage every product in the Raykels store.</p>
+</div>
+
+<button
+type="button"
+class="admin-button primary"
+id="addProductButton" style="display:block !important; visibility:visible !important; opacity:1 !important;">
++ Add Product
+</button>
+</div>
+
+<div class="admin-card">
+
+<div class="table-toolbar">
+
+<input
+type="search"
+id="productSearch"
+placeholder="Search products...">
+
+<select id="productCategoryFilter">
+<option value="">All categories</option>
+<option value="hair">Hair</option>
+<option value="wigs">Wigs</option>
+<option value="bags">Bags</option>
+<option value="shoes">Shoes</option>
+<option value="children">Children</option>
+</select>
+
+</div>
+
+<div id="productsTable" class="products-table">
+
+<div class="empty-state">
+
+<strong>No products yet</strong>
+
+<p>
+Your products will appear here after you add them.
+</p>
+
+<button
+type="button"
+class="admin-button primary"
+id="firstProductButton">
+Add Your First Product
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+</section>
+</main>
+</div>
+<script src="admin.js?v=12"></script>
+</body>
+</html>
+
+<section class="admin-section" id="add-product">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">PRODUCT MANAGEMENT</p>
+      <h2>Add Product</h2>
+    </div>
+  </div>
+
+  <form id="productForm" class="product-form">
+
+    <div class="form-group">
+      <label for="productName">Product Name</label>
+      <input
+        type="text"
+        id="productName"
+        name="name"
+        placeholder="e.g. Bone Straight Human Hair"
+        required>
+    </div>
+
+    <div class="form-group">
+      <label for="productCategory">Category</label>
+      <select id="productCategory" name="category" required>
+        <option value="">Select category</option>
+        <option value="hair">Hair</option>
+        <option value="wigs">Wigs</option>
+        <option value="bags">Bags</option>
+        <option value="shoes">Shoes</option>
+        <option value="children">Children</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="productImageSection" style="display:none;">
+      <label>PRODUCT IMAGES</label>
+
+      <div class="product-upload-box">
+        <p>Select the product image from your device.</p>
+
+        <input
+          type="file"
+          id="productImages"
+          name="images"
+          accept="image/jpeg,image/png,image/webp"
+          multiple>
+
+        <div id="selectedProductFiles"></div>
+
+        <button
+          type="button"
+          id="uploadProductImages"
+          class="admin-button primary"
+          style="display:none;">
+          Upload Selected Images
+        </button>
+      </div>
+    </div>
+
+    <div id="productDetails" class="product-details">
+      <p class="form-section-title">PRODUCT DETAILS</p>
+      <div id="dynamicProductFields"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="productSubcategory">Subcategory</label>
+      <input
+        type="text"
+        id="productSubcategory"
+        name="subcategory"
+        placeholder="e.g. Bone Straight">
+    </div>
+
+    <div class="form-group">
+      <label for="productBrand">Brand</label>
+      <input
+        type="text"
+        id="productBrand"
+        name="brand"
+        placeholder="Brand name">
+    </div>
+
+    <div class="form-group">
+      <label for="productSku">SKU</label>
+      <input
+        type="text"
+        id="productSku"
+        name="sku"
+        placeholder="e.g. RAY-HR-001">
+    </div>
+
+    <div class="form-group">
+      <label for="productPrice">Price (NGN)</label>
+      <input
+        type="number"
+        id="productPrice"
+        name="price"
+        min="0"
+        placeholder="0"
+        required>
+    </div>
+
+    <div class="form-group">
+      <label for="productSalePrice">Sale Price (NGN)</label>
+      <input
+        type="number"
+        id="productSalePrice"
+        name="salePrice"
+        min="0"
+        placeholder="Optional">
+    </div>
+
+    <div class="form-group">
+      <label for="productStock">Stock Quantity</label>
+      <input
+        type="number"
+        id="productStock"
+        name="stock"
+        min="0"
+        value="0">
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" id="productTrackStock" checked>
+        Track stock
+      </label>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label>
+        <input type="checkbox" id="productFeatured">
+        Featured product
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label for="productDescription">Description</label>
+      <textarea
+        id="productDescription"
+        name="description"
+        rows="5"
+        placeholder="Describe the product..."></textarea>
+    </div>
+
+    <button type="submit" class="admin-button primary">
+      Save Product
+    </button>
+
+  </form>
+</section>
+

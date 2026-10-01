@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed | RAYKELS LUXURY COLLECTIONS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="logo">
+    <span>RAYKELS</span>
+    <small>LUXURY</small>
+  </a>
+</header>
+
+<main class="catalogue-section">
+  <div class="catalogue-hero">
+    <p class="eyebrow">ORDER CONFIRMED</p>
+    <h1>Thank You</h1>
+    <p>Your Raykels order has been received.</p>
+  </div>
+
+  <section class="checkout-summary">
+    <h2 data-order-id>Order reference</h2>
+    <p data-order-status>Processing your order...</p>
+    <p data-order-total></p>
+    <p data-order-payment></p>
+    <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+  </section>
+</main>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const orderId = params.get("order");
+
+const orders =
+  JSON.parse(localStorage.getItem("raykels_orders") || "[]");
+
+const order = orders.find(item => item.orderId === orderId);
+
+if (order) {
+  document.querySelector("[data-order-id]").textContent =
+    order.orderId;
+
+  document.querySelector("[data-order-status]").textContent =
+    "Your order has been received.";
+
+  document.querySelector("[data-order-total]").textContent =
+    `Total: ₦${Number(order.total).toLocaleString("en-NG")}`;
+
+  document.querySelector("[data-order-payment]").textContent =
+    `Payment: ${order.payment}`;
+} else {
+  document.querySelector("[data-order-status]").textContent =
+    "Order reference not found on this device.";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+async function loadProductPage() {
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get('id');
+
+  if (!productId) {
+    showProductError('No product was selected.');
+    return;
+  }
+
+  const products = await window.RaykelsCatalogAPI.loadCatalog();
+  const product = products.find(item => item.id === productId);
+
+  if (!product) {
+    showProductError('Product not found.');
+    return;
+  }
+
+  document.title =
+    `${product.name} | RAYKELS LUXURY COLLECTIONS`;
+
+  const name = document.querySelector('[data-product-name]');
+  const description =
+    document.querySelector('[data-product-description]');
+  const price =
+    document.querySelector('[data-product-price]');
+  const image =
+    document.querySelector('[data-product-image]');
+  const quantity =
+    document.querySelector('[data-product-quantity]');
+  const addButton =
+    document.querySelector('[data-product-add]');
+
+  if (name) {
+    name.textContent = product.name;
+  }
+
+  if (description) {
+    description.textContent = product.description || '';
+  }
+
+  if (price) {
+    price.textContent =
+      window.RaykelsCatalogAPI.formatPrice(product.price);
+  }
+
+  if (image && product.images && product.images.length) {
+    image.src = product.images[0];
+    image.alt = product.name;
+  }
+
+  if (addButton) {
+    addButton.addEventListener('click', () => {
+      const selectedQuantity =
+        Math.max(1, Number(quantity?.value) || 1);
+
+      window.RaykelsCart.addToCart(
+        product.id,
+        selectedQuantity
+      );
+
+      addButton.textContent = 'Added to Cart ✓';
+
+      setTimeout(() => {
+        addButton.textContent = 'Add to Cart';
+      }, 1800);
+    });
+  }
+
+  console.log('Raykels product loaded:', product);
+}
+
+function showProductError(message) {
+  const container =
+    document.querySelector('[data-product-container]');
+
+  if (container) {
+    container.innerHTML = `<p>${message}</p>`;
+  }
+}
+
+loadProductPage();

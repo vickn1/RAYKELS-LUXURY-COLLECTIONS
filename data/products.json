@@ -1,0 +1,157 @@
+{
+  "products": [
+    {
+      "name": "Experiment",
+      "brand": "Hhhhy",
+      "category": "hair",
+      "subcategory": "Uggg",
+      "description": "Hfddfuiijvccccfffggjjhbbbhhhhh\nHjhhjj\nJjjjjj\nJjjjj\nJjjj\n\nHhhhh\n\n\nHhh\n\n\n\nJjjj\n\n\nJjj\n\nJj",
+      "sku": "Uhh",
+      "currency": "NGN",
+      "pricing": {
+        "price": 3555,
+        "salePrice": 688
+      },
+      "attributes": {
+        "colours": [
+          "Hgfffffhh"
+        ],
+        "sizes": [
+          "Jjvcxx"
+        ],
+        "lengths": [
+          "Jhhvvc"
+        ],
+        "materials": [
+          "Hgffffh"
+        ],
+        "ageRanges": [
+          "Hgxdffgh"
+        ]
+      },
+      "variants": [
+        {
+          "name": "Jhgcc",
+          "value": "Hgffghjj",
+          "price": "388800855"
+        }
+      ],
+      "inventory": {
+        "stock": 66,
+        "trackStock": true
+      },
+      "available": true,
+      "featured": true,
+      "published": true,
+      "images": [],
+      "id": "product_1790692669256_892znn",
+      "createdAt": "2026-09-29T14:37:49.269Z",
+      "updatedAt": "2026-09-30T01:49:18.088Z",
+      "videos": [
+        {
+          "id": "product_1790692669256_892znn-video-1790692669753-0",
+          "url": "/uploads/products/product_1790692669256_892znn/1790692669466-vid20260929153548.mp4",
+          "type": "video",
+          "label": "product",
+          "title": "Experiment video 1"
+        }
+      ]
+    },
+    {
+      "name": "media input experiment",
+      "brand": "hhhh",
+      "category": "bags",
+      "subcategory": "hh",
+      "description": "Jjskksksn",
+      "sku": "",
+      "currency": "NGN",
+      "pricing": {
+        "price": 5000,
+        "salePrice": 40000
+      },
+      "attributes": {
+        "colours": [],
+        "sizes": [],
+        "lengths": [],
+        "materials": [],
+        "ageRanges": []
+      },
+      "variants": [],
+      "inventory": {
+        "stock": 2,
+        "trackStock": true
+      },
+      "available": true,
+      "featured": false,
+      "published": true,
+      "images": [
+        {
+          "id": "product_1790714387293_sjy8ni-image-1790714387908-0",
+          "url": "/uploads/products/product_1790714387293_sjy8ni/1790714387429-screenshot-2026-09-29-13-06-24-59.jpg",
+          "type": "image",
+          "label": "product",
+          "alt": "media input experiment image 1"
+        },
+        {
+          "id": "product_1790714387293_sjy8ni-image-1790729042506-0",
+          "url": "/uploads/products/product_1790714387293_sjy8ni/1790729042438-screenshot-2026-09-20-17-26-00-85.jpg",
+          "type": "image",
+          "label": "product",
+          "alt": "media input experiment image 2"
+        }
+      ],
+      "videos": [],
+      "id": "product_1790714387293_sjy8ni",
+      "createdAt": "2026-09-29T20:39:47.294Z",
+      "updatedAt": "2026-09-30T00:44:02.348Z"
+    },
+    {
+      "name": "Video security test",
+      "brand": "",
+      "category": "hair",
+      "subcategory": "",
+      "description": "",
+      "sku": "",
+      "currency": "NGN",
+      "pricing": {
+        "price": 1000,
+        "salePrice": null
+      },
+      "attributes": {
+        "colours": [],
+        "sizes": [],
+        "lengths": [],
+        "materials": [],
+        "ageRanges": []
+      },
+      "variants": [],
+      "inventory": {
+        "stock": 0,
+        "trackStock": true
+      },
+      "available": false,
+      "featured": false,
+      "published": true,
+      "images": [
+        {
+          "id": "product_1790727153577_k25vni-image-1790728427379-0",
+          "url": "/uploads/products/product_1790727153577_k25vni/1790728427339-screenshot-2026-09-29-09-22-33-77.jpg",
+          "type": "image",
+          "label": "product",
+          "alt": "Video security test image 1"
+        },
+        {
+          "id": "product_1790727153577_k25vni-image-1790728427380-1",
+          "url": "/uploads/products/product_1790727153577_k25vni/1790728427359-fb-img-1790627699987.jpg",
+          "type": "image",
+          "label": "product",
+          "alt": "Video security test image 2"
+        }
+      ],
+      "videos": [],
+      "id": "product_1790727153577_k25vni",
+      "createdAt": "2026-09-30T00:12:33.586Z",
+      "updatedAt": "2026-09-30T00:33:47.256Z"
+    }
+  ]
+}

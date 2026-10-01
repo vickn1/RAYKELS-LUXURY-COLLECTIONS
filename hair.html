@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hair | RAYKELS LUXURY COLLECTIONS</title>
+  <meta name="description" content="Explore premium human hair and luxury hair collections from RAYKELS LUXURY COLLECTIONS.">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="logo">
+    <span>RAYKELS</span>
+    <small>LUXURY COLLECTIONS</small>
+  </div>
+
+  <nav class="main-nav">
+    <a href="index.html">Home</a>
+    <a href="hair.html">Hair</a>
+    <a href="bags.html">Bags</a>
+    <a href="shoes.html">Shoes</a>
+    <a href="children.html">Children</a>
+    <a href="wig-care.html">Wig Care</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+    <button class="menu-toggle" aria-label="Open menu">
+      ☰
+    </button>
+</header>
+
+<main>
+
+  <section class="catalogue-hero">
+    <p class="eyebrow">RAYKELS COLLECTION</p>
+    <h1>Luxury Hair</h1>
+    <p>
+      Discover premium human hair, bone straight and other
+      carefully selected hair collections.
+    </p>
+  </section>
+
+  <section class="catalogue-section">
+
+    <div class="catalogue-filters" data-collection-filters>
+      <button type="button" class="catalogue-filter active" data-subcategory="all">All Hair</button>
+      <button type="button" class="catalogue-filter" data-subcategory="bone-straight">Bone Straight</button>
+      <button type="button" class="catalogue-filter" data-subcategory="body-wave">Body Wave</button>
+      <button type="button" class="catalogue-filter" data-subcategory="water-wave">Water Wave</button>
+      <button type="button" class="catalogue-filter" data-subcategory="curly">Curly</button>
+    </div>
+
+    <div
+      class="product-grid"
+      data-category="hair"
+      data-product-grid>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="products/catalog.js"></script>
+<script src="products/cart.js"></script>
+<script>
+  window.RaykelsCollectionConfig = {
+    category: 'hair',
+    title: 'Luxury Hair',
+    filterSelector: '[data-collection-filters]'
+  };
+</script>
+<script src="assets/tracking/tracking.js"></script>
+<script src="products/collection-page.js"></script>
+<script src="script.js"></script>
+
+<footer class="site-footer">
+  <div>
+    <strong>RAYKELS LUXURY COLLECTIONS</strong>
+    <p>HiG 027 FATI ABUBAKAR Block, Wuye Ultramodern Market, Abuja</p>
+  </div>
+
+  <div>
+    <p><strong>WhatsApp</strong><br>
+    <a href="https://wa.me/2347057139583">07057193583</a></p>
+
+    <p><strong>Instagram</strong><br>
+    <a href="https://www.instagram.com/raykelsluxuryhair/" target="_blank" rel="noopener">
+      @raykelsluxuryhair
+    </a></p>
+
+    <p><strong>Facebook</strong><br>
+    <a href="https://www.facebook.com/share/19LdQPjgKA/" target="_blank" rel="noopener">
+      RAYKELS LUXURY COLLECTIONS
+    </a></p>
+  </div>
+
+  <p>© 2026 RAYKELS LUXURY COLLECTIONS. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

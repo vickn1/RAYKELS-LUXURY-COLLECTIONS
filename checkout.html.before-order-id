@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout | RAYKELS LUXURY COLLECTIONS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+<div class="logo"><span>RAYKELS</span><small>LUXURY COLLECTIONS</small></div>
+<nav class="main-nav">
+<a href="index.html">Home</a>
+<a href="hair.html">Hair</a>
+<a href="bags.html">Bags</a>
+<a href="shoes.html">Shoes</a>
+<a href="children.html">Children</a>
+<a href="wig-care.html">Wig Care</a>
+<a href="cart.html">Cart</a>
+</nav>
+</header>
+<main>
+<section class="catalogue-hero">
+<p class="eyebrow">RAYKELS COLLECTION</p>
+<h1>Checkout</h1>
+<p>Complete your details and choose your payment method.</p>
+</section>
+<section class="checkout-section">
+<div class="checkout-layout">
+<form class="checkout-form" id="checkout-form">
+<div class="checkout-block">
+<p class="eyebrow">01 — CONTACT</p>
+<h2>Your Details</h2>
+<label>Full Name<input type="text" name="name" required></label>
+<label>WhatsApp / Phone Number<input type="tel" name="phone" required></label>
+<label>Email Address<input type="email" name="email"></label>
+</div>
+<div class="checkout-block">
+<p class="eyebrow">02 — DELIVERY</p>
+<h2>Delivery Details</h2>
+<label>Delivery Address<textarea name="address" rows="4" required></textarea></label>
+<label>City<input type="text" name="city" required></label>
+<label>State<input type="text" name="state" required></label>
+<label>Order Notes<textarea name="notes" rows="3"></textarea></label>
+</div>
+<div class="checkout-block">
+<p class="eyebrow">03 — PAYMENT</p>
+<h2>Payment Method</h2>
+<label class="payment-option"><input type="radio" name="payment" value="card" required><span><strong>Card</strong><small>Pay securely online.</small></span></label>
+<label class="payment-option"><input type="radio" name="payment" value="transfer"><span><strong>Bank Transfer</strong><small>Receive payment instructions after checkout.</small></span></label>
+<label class="payment-option"><input type="radio" name="payment" value="cash"><span><strong>Cash</strong><small>Payment arrangement with Raykels.</small></span></label>
+</div>
+<button type="submit" class="btn btn-primary checkout-submit">Place Order</button>
+</form>
+<aside class="checkout-summary" data-checkout-summary>
+<p>Order Summary</p>
+<h2>Loading...</h2>
+</aside>
+</div>
+</section>
+</main>
+<script src="products/catalog.js"></script>
+<script src="products/cart.js"></script>
+<script>
+async function loadCheckout() {
+  const products = await window.RaykelsCatalogAPI.loadCatalog();
+  const cart = window.RaykelsCart.getCart();
+  const summary = document.querySelector("[data-checkout-summary]");
+
+  if (!cart.length) {
+    summary.innerHTML = "<p>Your cart is empty.</p><a href=\"index.html\">Continue Shopping</a>";
+    return;
+  }
+
+  let total = 0;
+
+  const items = cart.map(item => {
+    const product = products.find(p => p.id === item.productId);
+    if (!product) return "";
+    const subtotal = product.price * item.quantity;
+    total += subtotal;
+    return `<div class="checkout-summary-item">
+      <span>${product.name} × ${item.quantity}</span>
+      <strong>${window.RaykelsCatalogAPI.formatPrice(subtotal)}</strong>
+    </div>`;
+  }).join("");
+
+  summary.innerHTML = `
+    <p>Order Summary</p>
+    <div class="checkout-summary-items">${items}</div>
+    <div class="checkout-total">
+      <span>Total</span>
+      <strong>${window.RaykelsCatalogAPI.formatPrice(total)}</strong>
+    </div>
+  `;
+}
+
+document.querySelector("#checkout-form").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const form = new FormData(event.target);
+
+  const order = {
+    customer: {
+      name: form.get("name"),
+      phone: form.get("phone"),
+      email: form.get("email")
+    },
+    delivery: {
+      address: form.get("address"),
+      city: form.get("city"),
+      state: form.get("state"),
+      notes: form.get("notes")
+    },
+    payment: form.get("payment"),
+    items: window.RaykelsCart.getCart(),
+    total: window.RaykelsCart.getCartTotal(),
+    createdAt: new Date().toISOString()
+  };
+
+  console.log("Raykels order prepared:", order);
+
+  alert("Your order has been prepared. Payment processing will be connected next.");
+});
+
+function trackCheckoutStart() {
+  const cart = window.RaykelsCart.getCart();
+  const total = window.RaykelsCart.getCartTotal();
+
+  if (!cart.length) return;
+
+  const products = cart.map(item => {
+    const product =
+      window.RaykelsCatalogAPI.getProductById(item.productId);
+
+    if (!product) return null;
+
+    return {
+      item_id: product.id,
+      item_name: product.name,
+      price: Number(product.price),
+      quantity: item.quantity
+    };
+  }).filter(Boolean);
+
+  if (typeof fbq === "function") {
+    fbq("track", "InitiateCheckout", {
+      content_ids: products.map(item => item.item_id),
+      content_type: "product",
+      value: Number(total),
+      currency: "NGN",
+      num_items: products.reduce(
+        (sum, item) => sum + item.quantity, 0
+      )
+    });
+  }
+
+  if (typeof gtag === "function") {
+    gtag("event", "begin_checkout", {
+      currency: "NGN",
+      value: Number(total),
+      items: products
+    });
+  }
+}
+
+loadCheckout().then(trackCheckoutStart);
+</script>
+<script src="assets/tracking/tracking.js"></script>
+</body>
+</html>

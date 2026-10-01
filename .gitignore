@@ -1,0 +1,26 @@
+node_modules/
+server.log
+
+data/admin-auth.json
+data/admin-sessions.json
+
+.env
+.env.*
+!.env.example
+
+uploads/
+backups/
+
+*.tmp
+*.log
+
+data/payment-settings.json
+
+# Local / OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local GitHub CLI / credentials must never be inside the project
+.gh/

@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raykels Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<div id="adminLogin" class="admin-login">
+  <div class="admin-login-card">
+    <div class="brand">
+      <span>RAYKELS</span>
+      <small>LUXURY COLLECTIONS</small>
+    </div>
+
+    <h1>Administrator Login</h1>
+    <p>Sign in to manage the Raykels catalogue and orders.</p>
+
+    <form id="adminLoginForm">
+      <label>
+        Username
+        <input
+          id="adminUsername"
+          name="username"
+          type="text"
+          autocomplete="username"
+          required
+        >
+      </label>
+
+      <label>
+        Password
+        <input
+          id="adminPassword"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+      </label>
+
+      <button type="submit" class="primary-button">
+        Sign In
+      </button>
+
+      <p id="adminLoginError" class="notice error"></p>
+    </form>
+  </div>
+</div>
+
+<div class="admin-shell" id="adminShell">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span>RAYKELS</span>
+      <small>LUXURY COLLECTIONS</small>
+    </div>
+
+    <nav>
+      <button class="nav-link active" data-view="dashboard">
+        Dashboard
+      </button>
+
+      <button class="nav-link" data-view="orders">
+        Orders
+      </button>
+
+      <button class="nav-link" data-view="products">
+        Products
+      </button>
+
+      <button class="nav-link" data-view="add-product">
+        Add Product
+      </button>
+
+      <button class="nav-link" data-view="analytics">
+        Analytics
+      </button>
+
+      <button class="nav-link" data-view="settings">
+        Settings
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      Raykels Admin
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <p id="pageSubtitle">RAYKELS LUXURY COLLECTIONS</p>
+      </div>
+
+      <div class="topbar-actions">
+        <button id="topAddProduct" class="primary-button">
+          + Add Product
+        </button>
+
+        <button id="adminLogout" class="secondary-button" type="button">
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <div id="notice" class="notice"></div>
+
+    <!-- DASHBOARD -->
+
+    <section id="view-dashboard" class="view active">
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <span>Total Products</span>
+          <strong id="statProducts">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Published</span>
+          <strong id="statPublished">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Featured</span>
+          <strong id="statFeatured">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Out of Stock</span>
+          <strong id="statOutOfStock">0</strong>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Recent Products</h2>
+            <p>Your latest catalogue items.</p>
+          </div>
+
+          <button class="secondary-button" data-view-target="products">
+            View All
+          </button>
+        </div>
+
+        <div id="recentProducts" class="product-list"></div>
+      </div>
+
+    </section>
+
+
+    <!-- ORDERS -->
+
+    <section id="view-orders" class="view">
+
+      <div class="panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Orders</h2>
+            <p>Review customer requests and confirm availability.</p>
+          </div>
+        </div>
+
+        <div id="ordersContent">
+          <div class="orders-toolbar">
+            <label for="orderStatusFilter">Status</label>
+
+            <select id="orderStatusFilter">
+              <option value="all">All orders</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="processing">Processing</option>
+              <option value="ready">Ready</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+
+            <button
+              type="button"
+              id="refreshOrdersButton"
+              class="secondary-button"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <div id="ordersList" class="orders-list">
+            <p>Loading orders...</p>
+          </div>
+
+          <div
+            id="orderDetailPanel"
+            class="order-detail-panel"
+            hidden
+          >
+            <div class="panel-heading">
+              <div>
+                <h3 id="orderDetailTitle">Order</h3>
+                <p id="orderDetailStatus"></p>
+              </div>
+
+              <button
+                type="button"
+                id="closeOrderDetailButton"
+                class="secondary-button"
+              >
+                Close
+              </button>
+            </div>
+
+            <div
+              id="orderCustomerDetails"
+              class="order-section"
+            ></div>
+
+            <div
+              id="orderItemsDetails"
+              class="order-section"
+            ></div>
+
+            <form
+              id="orderConfirmationForm"
+              class="order-confirmation-form"
+              hidden
+            >
+              <div class="form-section">
+                <h3>Admin confirmation</h3>
+
+                <p class="order-help">
+                  Contact the customer first. Confirm only the quantity
+                  you agree to supply and add the agreed delivery fee.
+                </p>
+
+                <div id="confirmedQuantitiesFields"></div>
+
+                <div class="form-grid">
+                  <label>
+                    Delivery fee (₦)
+                    <input
+                      id="orderDeliveryFee"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value="0"
+                      required
+                    >
+                  </label>
+
+                  <label>
+                    Admin note
+                    <input
+                      id="orderAdminNote"
+                      type="text"
+                      maxlength="500"
+                      placeholder="Confirmation notes"
+                    >
+                  </label>
+                </div>
+
+                <div class="form-actions">
+                  <button
+                    type="submit"
+                    class="primary-button"
+                  >
+                    Confirm Order
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div
+              id="orderDetailNotice"
+              class="notice"
+              role="status"
+              aria-live="polite"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+
+    <section id="view-products" class="view">
+
+      <div class="panel">
+
+        <div class="panel-heading">
+          <div>
+            <h2>Products</h2>
+            <p>Manage your Raykels catalogue.</p>
+          </div>
+
+          <button class="primary-button" data-view-target="add-product">
+            + Add Product
+          </button>
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            id="productSearch"
+            type="search"
+            placeholder="Search products..."
+          >
+
+          <select id="productCategoryFilter">
+            <option value="">All Categories</option>
+            <option value="hair">Hair</option>
+            <option value="bags">Bags</option>
+            <option value="shoes">Shoes</option>
+            <option value="children">Children</option>
+          </select>
+
+        </div>
+
+        <div id="productsTable" class="product-list"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ANALYTICS -->
+
+    <section id="view-analytics" class="view">
+
+      <div class="panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Analytics</h2>
+            <p>Understand traffic and customer activity.</p>
+          </div>
+        </div>
+
+        <div id="analyticsContent">
+
+          <div class="analytics-toolbar">
+            <button
+              type="button"
+              id="refreshAnalytics"
+              class="secondary-button"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <div class="stats-grid analytics-stats">
+            <div class="stat-card">
+              <span>Visitors</span>
+              <strong id="analyticsVisitors">—</strong>
+            </div>
+
+            <div class="stat-card">
+              <span>Sessions</span>
+              <strong id="analyticsSessions">—</strong>
+            </div>
+
+            <div class="stat-card">
+              <span>Page Views</span>
+              <strong id="analyticsPageViews">—</strong>
+            </div>
+
+            <div class="stat-card">
+              <span>Events</span>
+              <strong id="analyticsEvents">—</strong>
+            </div>
+          </div>
+
+          <div class="analytics-section">
+            <div class="analytics-section-heading">
+              <div>
+                <h3>Customer Activity</h3>
+                <p>Actions visitors take across the storefront.</p>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span>Product Views</span>
+                <strong id="analyticsProductViews">—</strong>
+              </div>
+
+              <div class="stat-card">
+                <span>Product Clicks</span>
+                <strong id="analyticsProductClicks">—</strong>
+              </div>
+
+              <div class="stat-card">
+                <span>Add to Cart</span>
+                <strong id="analyticsAddToCart">—</strong>
+              </div>
+
+              <div class="stat-card">
+                <span>Checkout Started</span>
+                <strong id="analyticsCheckoutStarted">—</strong>
+              </div>
+
+              <div class="stat-card">
+                <span>Orders Submitted</span>
+                <strong id="analyticsOrdersSubmitted">—</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="analytics-section">
+            <div class="analytics-section-heading">
+              <div>
+                <h3>Conversion Funnel</h3>
+                <p>Visitor activity from discovery to order request.</p>
+              </div>
+            </div>
+
+            <div id="analyticsFunnel" class="analytics-funnel"></div>
+          </div>
+
+          <div class="analytics-columns">
+
+            <div class="analytics-section">
+              <div class="analytics-section-heading">
+                <div>
+                  <h3>Popular Products</h3>
+                  <p>Products receiving the most views.</p>
+                </div>
+              </div>
+
+              <div id="analyticsPopularProducts"></div>
+            </div>
+
+            <div class="analytics-section">
+              <div class="analytics-section-heading">
+                <div>
+                  <h3>Popular Pages</h3>
+                  <p>Pages receiving the most views.</p>
+                </div>
+              </div>
+
+              <div id="analyticsPopularPages"></div>
+            </div>
+
+          </div>
+
+          <div class="analytics-section">
+            <div class="analytics-section-heading">
+              <div>
+                <h3>Recent Activity</h3>
+                <p>Latest anonymous storefront events.</p>
+              </div>
+            </div>
+
+            <div id="analyticsRecentActivity"></div>
+          </div>
+
+          <div
+            id="analyticsNotice"
+            class="notice"
+            role="status"
+            aria-live="polite"
+          ></div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SETTINGS -->
+
+    <section id="view-settings" class="view">
+
+      <div class="panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Settings</h2>
+            <p>Manage Raykels administration settings.</p>
+          </div>
+        </div>
+
+        <div id="settingsContent">
+
+          <div class="settings-section">
+            <div class="settings-section-heading">
+              <div>
+                <h3>Homepage</h3>
+                <p>
+                  Control the main homepage presentation and featured product display.
+                </p>
+              </div>
+            </div>
+
+            <form id="homepageSettingsForm">
+
+              <div class="settings-section-subheading">
+                <h4>Hero</h4>
+                <p>Control the main homepage hero and its automatic rotation.</p>
+              </div>
+
+              <label class="settings-toggle">
+                <input
+                  type="checkbox"
+                  id="heroEnabled"
+                  checked
+                >
+                <span>
+                  <strong>Enable Hero</strong>
+                  <small>Show the main homepage hero section.</small>
+                </span>
+              </label>
+
+              <label class="settings-toggle">
+                <input
+                  type="checkbox"
+                  id="heroAutoRotate"
+                  checked
+                >
+                <span>
+                  <strong>Enable Hero Rotation</strong>
+                  <small>Automatically rotate the hero media.</small>
+                </span>
+              </label>
+
+              <div class="form-grid">
+                <label>
+                  Hero Rotation Speed
+                  <select id="heroRotationSeconds">
+                    <option value="3">3 seconds</option>
+                    <option value="5" selected>5 seconds</option>
+                    <option value="7">7 seconds</option>
+                    <option value="10">10 seconds</option>
+                    <option value="15">15 seconds</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="settings-section-subheading">
+                <h4>Featured Products</h4>
+                <p>
+                  Choose how featured products appear on the homepage.
+                </p>
+              </div>
+
+              <label class="settings-toggle">
+                <input
+                  type="checkbox"
+                  id="featuredProductsEnabled"
+                  checked
+                >
+                <span>
+                  <strong>Enable Featured Products</strong>
+                  <small>Show the Featured Pieces section on the homepage.</small>
+                </span>
+              </label>
+
+              <label class="settings-toggle">
+                <input
+                  type="checkbox"
+                  id="featuredAutoRotate"
+                  checked
+                >
+                <span>
+                  <strong>Enable Featured Rotation</strong>
+                  <small>Automatically rotate featured products.</small>
+                </span>
+              </label>
+
+              <div class="form-grid">
+                <label>
+                  Featured Display
+                  <select id="featuredDisplayMode">
+                    <option value="carousel" selected>Carousel</option>
+                    <option value="grid">Grid</option>
+                  </select>
+                </label>
+
+                <label>
+                  Featured Rotation Speed
+                  <select id="featuredRotationSeconds">
+                    <option value="3">3 seconds</option>
+                    <option value="5" selected>5 seconds</option>
+                    <option value="7">7 seconds</option>
+                    <option value="10">10 seconds</option>
+                    <option value="15">15 seconds</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="settings-section-subheading">
+                <h4>Homepage Sections</h4>
+                <p>Choose which major sections are visible to customers.</p>
+              </div>
+
+              <label class="settings-toggle">
+                <input
+                  type="checkbox"
+                  id="collectionsEnabled"
+                  checked
+                >
+                <span>
+                  <strong>Show Collections</strong>
+                  <small>Display the main product collections section.</small>
+                </span>
+              </label>
+
+              <label class="settings-toggle">
+                <input
+                  type="checkbox"
+                  id="servicesEnabled"
+                  checked
+                >
+                <span>
+                  <strong>Show Services & Consultation</strong>
+                  <small>Display services and consultation content.</small>
+                </span>
+              </label>
+
+              <div class="settings-actions">
+                <button
+                  type="submit"
+                  class="primary-button"
+                  id="saveHomepageSettings"
+                >
+                  Save Homepage Settings
+                </button>
+              </div>
+
+            </form>
+
+            <div
+              id="homepageSettingsNotice"
+              class="notice"
+              aria-live="polite"
+            ></div>
+
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-heading">
+              <div>
+                <h3>Bank Transfer Details</h3>
+                <p>
+                  These details are shown to customers when Bank Transfer
+                  is selected at checkout.
+                </p>
+              </div>
+            </div>
+
+            <form id="bankTransferSettingsForm">
+
+              <label class="settings-toggle">
+                <input
+                  type="checkbox"
+                  id="bankTransferEnabled"
+                  checked
+                >
+                <span>
+                  <strong>Enable Bank Transfer</strong>
+                  <small>
+                    Allow customers to select Bank Transfer at checkout.
+                  </small>
+                </span>
+              </label>
+
+              <div class="form-grid">
+
+                <label>
+                  Bank Name
+                  <input
+                    id="bankName"
+                    type="text"
+                    maxlength="120"
+                    autocomplete="organization"
+                    placeholder="e.g. First Bank"
+                  >
+                </label>
+
+                <label>
+                  Account Name
+                  <input
+                    id="accountName"
+                    type="text"
+                    maxlength="160"
+                    autocomplete="name"
+                    placeholder="Account holder name"
+                  >
+                </label>
+
+                <label>
+                  Account Number
+                  <input
+                    id="accountNumber"
+                    type="text"
+                    maxlength="40"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    placeholder="Account number"
+                  >
+                </label>
+
+                <label class="settings-full-width">
+                  Transfer Instructions
+                  <textarea
+                    id="bankTransferInstructions"
+                    maxlength="1000"
+                    rows="5"
+                    placeholder="Additional instructions for customers"
+                  ></textarea>
+                </label>
+
+              </div>
+
+              <div class="settings-actions">
+                <button
+                  type="submit"
+                  class="primary-button"
+                  id="saveBankTransferSettings"
+                >
+                  Save Bank Details
+                </button>
+              </div>
+
+            </form>
+
+            <div
+              id="bankTransferSettingsNotice"
+              class="notice"
+              aria-live="polite"
+            ></div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ADD / EDIT PRODUCT -->
+
+    <section id="view-add-product" class="view">
+
+      <div class="panel">
+
+        <div class="panel-heading">
+          <div>
+            <h2 id="formTitle">Add Product</h2>
+            <p>Create or edit a Raykels product.</p>
+          </div>
+
+          <button
+            id="cancelEdit"
+            class="secondary-button"
+            type="button"
+          >
+            Cancel
+          </button>
+        </div>
+
+
+        <form id="productForm">
+
+          <input type="hidden" id="productId">
+
+
+          <div class="form-section">
+
+            <h3>Basic Information</h3>
+
+            <div class="form-grid">
+
+              <label>
+                Product Name
+                <input
+                  id="productName"
+                  required
+                  maxlength="160"
+                >
+              </label>
+
+              <label>
+                Category
+                <select id="productCategory" required>
+                  <option value="">Select category</option>
+                  <option value="hair">Hair</option>
+                  <option value="bags">Bags</option>
+                  <option value="shoes">Shoes</option>
+                  <option value="children">Children</option>
+                </select>
+              </label>
+
+              <label>
+                Subcategory
+                <input id="productSubcategory">
+              </label>
+
+              <label>
+                Brand
+                <input id="productBrand">
+              </label>
+
+              <label>
+                SKU
+                <input id="productSku">
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-section">
+
+            <h3>Pricing</h3>
+
+            <div class="form-grid">
+
+              <label>
+                Price (NGN)
+                <input
+                  id="productPrice"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  required
+                >
+              </label>
+
+              <label>
+                Sale Price (NGN)
+                <input
+                  id="productSalePrice"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                >
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-section">
+
+            <h3>Inventory</h3>
+
+            <div class="form-grid">
+
+              <label>
+                Stock Quantity
+                <input
+                  id="productStock"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value="0"
+                >
+              </label>
+
+              <label class="checkbox-row">
+                <input
+                  id="productTrackStock"
+                  type="checkbox"
+                  checked
+                >
+                Track stock
+              </label>
+
+              <label class="checkbox-row">
+                <input
+                  id="productFeatured"
+                  type="checkbox"
+                >
+                Featured product
+              </label>
+
+              <label class="checkbox-row">
+                <input
+                  id="productPublished"
+                  type="checkbox"
+                  checked
+                >
+                Published
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-section">
+
+            <h3>Product Media</h3>
+
+            <p class="field-help">
+              Upload up to 20 images and product videos.
+              Images: JPG, PNG or WebP. Videos: MP4, WebM or MOV.
+            </p>
+
+            <label class="field-label" for="productImages">
+              Product Images
+            </label>
+
+            <input
+              id="productImages"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+            >
+
+            <label class="field-label" for="productVideos">
+              Product Videos
+            </label>
+
+            <input
+              id="productVideos"
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime"
+              multiple
+            >
+
+            <div id="imagePreview" class="image-preview"></div>
+
+            <div id="videoPreview" class="image-preview"></div>
+
+          </div>
+
+
+          <div class="form-section">
+
+            <h3>Attributes</h3>
+
+            <div class="form-grid">
+
+              <label>
+                Colours
+                <input
+                  id="productColours"
+                  placeholder="Black, Brown, Gold"
+                >
+              </label>
+
+              <label>
+                Sizes
+                <input
+                  id="productSizes"
+                  placeholder="S, M, L"
+                >
+              </label>
+
+              <label>
+                Lengths
+                <input
+                  id="productLengths"
+                  placeholder="12, 14, 16"
+                >
+              </label>
+
+              <label>
+                Materials
+                <input
+                  id="productMaterials"
+                  placeholder="Leather, Human Hair"
+                >
+              </label>
+
+              <label>
+                Age Ranges
+                <input
+                  id="productAgeRanges"
+                  placeholder="2-4 years, 5-7 years"
+                >
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-section">
+
+            <h3>Variants</h3>
+
+            <p class="field-help">
+              Add variants such as colour, size or length.
+            </p>
+
+            <div id="variants"></div>
+
+            <button
+              id="addVariant"
+              type="button"
+              class="secondary-button"
+            >
+              + Add Variant
+            </button>
+
+          </div>
+
+
+          <div class="form-section">
+
+            <h3>Description</h3>
+
+            <textarea
+              id="productDescription"
+              rows="7"
+              placeholder="Describe the product..."
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-actions">
+
+            <button
+              type="button"
+              id="cancelEditBottom"
+              class="secondary-button"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              id="saveProduct"
+              class="primary-button"
+            >
+              Save Product
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>

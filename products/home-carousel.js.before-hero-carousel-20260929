@@ -1,0 +1,292 @@
+(function () {
+  'use strict';
+
+  const carousel = document.querySelector('[data-product-carousel]');
+  if (!carousel) return;
+
+  const track = carousel.querySelector('[data-carousel-track]');
+  const prevButton = carousel.querySelector('[data-carousel-prev]');
+  const nextButton = carousel.querySelector('[data-carousel-next]');
+  const dots = document.querySelector('[data-carousel-dots]');
+
+  let products = [];
+  let currentIndex = 0;
+  let timer = null;
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function getMedia(product) {
+    const media = [];
+
+    const images = Array.isArray(product?.images) ? product.images : [];
+    const videos = Array.isArray(product?.videos) ? product.videos : [];
+
+    images.forEach((item, index) => {
+      const url = typeof item === 'string' ? item : item?.url;
+      if (!url) return;
+
+      media.push({
+        id: item?.id || `${product.id || 'product'}-image-${index}`,
+        type: 'image',
+        url,
+        alt: item?.alt || product?.name || 'RAYKELS product image',
+        title: item?.title || product?.name || ''
+      });
+    });
+
+    videos.forEach((item, index) => {
+      const url = typeof item === 'string' ? item : item?.url;
+      if (!url) return;
+
+      media.push({
+        id: item?.id || `${product.id || 'product'}-video-${index}`,
+        type: 'video',
+        url,
+        title: item?.title || product?.name || 'RAYKELS product video',
+        poster: item?.poster || item?.thumbnail || ''
+      });
+    });
+
+    return media;
+  }
+
+  function createMedia(media, product) {
+    if (!media) {
+      return '<div class="product-carousel-placeholder">RAYKELS</div>';
+    }
+
+    if (media.type === 'video') {
+      const poster = media.poster
+        ? ` poster="${escapeHtml(media.poster)}"`
+        : '';
+
+      return `
+        <video
+          class="product-carousel-media"
+          src="${escapeHtml(media.url)}"
+          ${poster}
+          muted
+          loop
+          playsinline
+          controls
+          preload="metadata"
+          aria-label="${escapeHtml(media.title || product.name || 'Product video')}"
+        ></video>
+      `;
+    }
+
+    return `
+      <img
+        class="product-carousel-media"
+        src="${escapeHtml(media.url)}"
+        alt="${escapeHtml(media.alt || product.name || 'Product image')}"
+        loading="lazy"
+      >
+    `;
+  }
+
+  function render() {
+    if (!products.length) {
+      track.innerHTML = `
+        <div class="product-carousel-empty">
+          <p>Our latest pieces will appear here soon.</p>
+        </div>
+      `;
+
+      prevButton.hidden = true;
+      nextButton.hidden = true;
+      dots.innerHTML = '';
+      return;
+    }
+
+    track.innerHTML = products.map((product, index) => {
+      const media = getMedia(product)[0];
+
+      const price = window.RaykelsCatalogAPI?.getEffectivePrice
+        ? window.RaykelsCatalogAPI.getEffectivePrice(product)
+        : null;
+
+      const formattedPrice =
+        window.RaykelsCatalogAPI?.formatPrice && price !== null
+          ? window.RaykelsCatalogAPI.formatPrice(price)
+          : '';
+
+      return `
+        <article
+          class="product-carousel-slide${index === currentIndex ? ' active' : ''}"
+          data-slide="${index}"
+        >
+          <a
+            class="product-carousel-product"
+            href="product.html?id=${encodeURIComponent(product.id)}"
+            aria-label="View ${escapeHtml(product.name || 'product')}"
+          >
+            <div class="product-carousel-media-wrap">
+              ${createMedia(media, product)}
+            </div>
+
+            <div class="product-carousel-info">
+              <p class="product-carousel-category">
+                ${escapeHtml(product.category || '')}
+              </p>
+
+              <h3>${escapeHtml(product.name || 'RAYKELS Product')}</h3>
+
+              ${
+                formattedPrice
+                  ? `<strong>${escapeHtml(formattedPrice)}</strong>`
+                  : ''
+              }
+            </div>
+          </a>
+        </article>
+      `;
+    }).join('');
+
+    renderDots();
+    updatePosition();
+    setupVideos();
+  }
+
+  function renderDots() {
+    dots.innerHTML = products.map((_, index) => `
+      <button
+        type="button"
+        class="product-carousel-dot${index === currentIndex ? ' active' : ''}"
+        data-carousel-dot="${index}"
+        aria-label="Show product ${index + 1}"
+        aria-current="${index === currentIndex ? 'true' : 'false'}"
+      ></button>
+    `).join('');
+
+    dots.querySelectorAll('[data-carousel-dot]').forEach(button => {
+      button.addEventListener('click', () => {
+        goTo(Number(button.dataset.carouselDot));
+        restartAutoPlay();
+      });
+    });
+  }
+
+  function updatePosition() {
+    const slides = track.querySelectorAll('.product-carousel-slide');
+
+    slides.forEach((slide, index) => {
+      slide.classList.toggle('active', index === currentIndex);
+      slide.setAttribute(
+        'aria-hidden',
+        index === currentIndex ? 'false' : 'true'
+      );
+    });
+
+    dots.querySelectorAll('[data-carousel-dot]').forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentIndex);
+      dot.setAttribute(
+        'aria-current',
+        index === currentIndex ? 'true' : 'false'
+      );
+    });
+
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+    prevButton.disabled = products.length <= 1;
+    nextButton.disabled = products.length <= 1;
+  }
+
+  function goTo(index) {
+    if (!products.length) return;
+
+    currentIndex = (index + products.length) % products.length;
+    updatePosition();
+  }
+
+  function setupVideos() {
+    track.querySelectorAll('video').forEach(video => {
+      video.addEventListener('mouseenter', () => {
+        video.play().catch(() => {});
+      });
+
+      video.addEventListener('mouseleave', () => {
+        video.pause();
+      });
+    });
+  }
+
+  function startAutoPlay() {
+    if (products.length <= 1) return;
+
+    stopAutoPlay();
+
+    timer = setInterval(() => {
+      goTo(currentIndex + 1);
+    }, 6000);
+  }
+
+  function stopAutoPlay() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  function restartAutoPlay() {
+    startAutoPlay();
+  }
+
+  async function init() {
+    try {
+      if (!window.RaykelsCatalogAPI?.loadCatalog) {
+        throw new Error('Raykels catalog API is not available.');
+      }
+
+      const catalog = await window.RaykelsCatalogAPI.loadCatalog();
+
+      products = catalog.filter(product => {
+        return product &&
+          product.published !== false &&
+          getMedia(product).length > 0;
+      });
+
+      const featured = products.filter(
+        product => product.featured === true
+      );
+
+      if (featured.length) {
+        products = featured;
+      }
+
+      render();
+      startAutoPlay();
+
+    } catch (error) {
+      console.error('Raykels homepage carousel failed:', error);
+
+      track.innerHTML = `
+        <div class="product-carousel-empty">
+          <p>Products could not be loaded right now.</p>
+        </div>
+      `;
+    }
+  }
+
+  prevButton.addEventListener('click', () => {
+    goTo(currentIndex - 1);
+    restartAutoPlay();
+  });
+
+  nextButton.addEventListener('click', () => {
+    goTo(currentIndex + 1);
+    restartAutoPlay();
+  });
+
+  carousel.addEventListener('mouseenter', stopAutoPlay);
+  carousel.addEventListener('mouseleave', startAutoPlay);
+
+  init();
+})();
